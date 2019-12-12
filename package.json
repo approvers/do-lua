@@ -1,0 +1,28 @@
+{
+  "name": "lua-js",
+  "version": "1.0.0",
+  "description": "The Lua binding for JavaScript.",
+  "main": "main.js",
+  "scripts": {
+    "install": "node-gyp rebuild"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MikuroXina/lua-js.git"
+  },
+  "keywords": [
+    "Lua",
+    "Node",
+    "JavaScript"
+  ],
+  "author": "MikuroXina",
+  "license": "Apache-2.0",
+  "gypfile": true,
+  "bugs": {
+    "url": "https://github.com/MikuroXina/lua-js/issues"
+  },
+  "homepage": "https://github.com/MikuroXina/lua-js#readme",
+  "dependencies": {
+    "nan": "^2.14.0"
+  }
+}
