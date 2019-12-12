@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/MikuroXina/lua-js#readme",
   "dependencies": {
+    "bindings": "^1.5.0",
     "nan": "^2.14.0"
   }
 }
