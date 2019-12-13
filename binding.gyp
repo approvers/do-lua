@@ -4,7 +4,7 @@
       "target_name": "lua-js",
       "sources": [
         "src/entry.cpp",
-        "src/do_file.cpp"
+        "src/dofile.cpp"
       ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")",
