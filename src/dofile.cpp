@@ -72,9 +72,6 @@ void do_file_async(const Nan::FunctionCallbackInfo<Value> &args) {
 }
 
 void do_file_sync(const Nan::FunctionCallbackInfo<Value> &args) {
-  auto *iso = args.GetIsolate();
-  Local<Context> ctx = iso->GetCurrentContext();
-
   if (args.Length() < 1 || !args[0]->IsString()) {
     Nan::ThrowTypeError("the file to execute has not specified");
     return;
