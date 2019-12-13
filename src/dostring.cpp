@@ -1,4 +1,4 @@
-#include "dofile.hpp"
+#include "dostring.hpp"
 
 #include <iostream>
 #include <lua/lua.hpp>
@@ -20,10 +20,10 @@ using v8::Number;
 using v8::String;
 using v8::Value;
 
-int do_file(std::string const &file_name) {
+int do_string(std::string const &program) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
-  int ret = luaL_dofile(L, file_name.c_str());
+  int ret = luaL_dostring(L, program.c_str());
   if (ret != 0) {
     std::cerr << lua_tostring(L, -1) << "\n";
   }
@@ -31,17 +31,17 @@ int do_file(std::string const &file_name) {
   return ret;
 }
 
-class DoFileWorker : public Nan::AsyncWorker {
+class DoStringWorker : public Nan::AsyncWorker {
 private:
-  string const file_name;
+  string const program;
   int ret;
 
 public:
-  DoFileWorker(Nan::Callback *callback, string file_name)
-      : Nan::AsyncWorker(callback), file_name(file_name), ret(0) {}
-  ~DoFileWorker() = default;
+  DoStringWorker(Nan::Callback *callback, string program)
+      : Nan::AsyncWorker(callback), program(program), ret(0) {}
+  ~DoStringWorker() = default;
 
-  void Execute() override { ret = do_file(file_name); }
+  void Execute() override { ret = do_string(program); }
 
   void HandleOKCallback() override {
     Nan::HandleScope scope;
@@ -52,12 +52,12 @@ public:
   }
 };
 
-void do_file_async(const Nan::FunctionCallbackInfo<Value> &args) {
+void do_string_async(const Nan::FunctionCallbackInfo<Value> &args) {
   auto *iso = args.GetIsolate();
   Local<Context> ctx = iso->GetCurrentContext();
 
   if (args.Length() < 1 || !args[0]->IsString()) {
-    Nan::ThrowTypeError("the file to execute has not specified");
+    Nan::ThrowTypeError("the string to execute has not specified");
     return;
   }
 
@@ -66,29 +66,27 @@ void do_file_async(const Nan::FunctionCallbackInfo<Value> &args) {
     return;
   }
 
-  String::Utf8Value utf8_file_name(iso,
-                                   args[0]->ToString(ctx).ToLocalChecked());
-  string file_name(*utf8_file_name);
+  String::Utf8Value utf8_program(iso, args[0]->ToString(ctx).ToLocalChecked());
+  string program(*utf8_program);
 
   Callback *callback = new Callback(To<Function>(args[1]).ToLocalChecked());
 
-  AsyncQueueWorker(new DoFileWorker(callback, file_name));
+  AsyncQueueWorker(new DoStringWorker(callback, program));
 }
 
-void do_file_sync(const Nan::FunctionCallbackInfo<Value> &args) {
+void do_string_sync(const Nan::FunctionCallbackInfo<Value> &args) {
   auto *iso = args.GetIsolate();
   Local<Context> ctx = iso->GetCurrentContext();
 
   if (args.Length() < 1 || !args[0]->IsString()) {
-    Nan::ThrowTypeError("the file to execute has not specified");
+    Nan::ThrowTypeError("the string to execute has not specified");
     return;
   }
 
-  String::Utf8Value utf8_file_name(iso,
-                                   args[0]->ToString(ctx).ToLocalChecked());
-  string file_name(*utf8_file_name);
+  String::Utf8Value utf8_program(iso, args[0]->ToString(ctx).ToLocalChecked());
+  string program(*utf8_program);
 
-  auto ret = static_cast<int32_t>(do_file(file_name));
+  auto ret = static_cast<int32_t>(do_string(program));
   args.GetReturnValue().Set(ret);
   return;
 }

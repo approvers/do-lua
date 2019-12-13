@@ -8,5 +8,13 @@ module.exports = {
     return new Promise((resolve) => {
       lua_js.doFile(file_name, resolve);
     });
+  },
+  doStringSync(program) {
+    return lua_js.doStringSync(program);
+  },
+  doString(program) {
+    return new Promise((resolve) => {
+      lua_js.doString(program, resolve);
+    });
   }
 };

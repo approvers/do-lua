@@ -3,8 +3,6 @@
 
 #include <nan.h>
 
-int do_file(std::string const &file_name);
-
 void do_file_async(const Nan::FunctionCallbackInfo<v8::Value> &args);
 
 void do_file_sync(const Nan::FunctionCallbackInfo<v8::Value> &args);

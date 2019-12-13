@@ -1,4 +1,5 @@
 #include "dofile.hpp"
+#include "dostring.hpp"
 
 #include <nan.h>
 
@@ -13,6 +14,14 @@ void init(Local<Object> exports) {
                    .ToLocalChecked());
   exports->Set(ctx, Nan::New("doFile").ToLocalChecked(),
                Nan::New<FunctionTemplate>(do_file_async)
+                   ->GetFunction(ctx)
+                   .ToLocalChecked());
+  exports->Set(ctx, Nan::New("doStringSync").ToLocalChecked(),
+               Nan::New<FunctionTemplate>(do_string_sync)
+                   ->GetFunction(ctx)
+                   .ToLocalChecked());
+  exports->Set(ctx, Nan::New("doString").ToLocalChecked(),
+               Nan::New<FunctionTemplate>(do_string_async)
                    ->GetFunction(ctx)
                    .ToLocalChecked());
 }
