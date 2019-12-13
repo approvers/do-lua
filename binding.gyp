@@ -5,7 +5,8 @@
       "sources": [
         "src/entry.cpp",
         "src/dofile.cpp",
-        "src/dostring.cpp"
+        "src/dostring.cpp",
+        "src/lua_program.cpp"
       ],
       "include_dirs": [
         "<!(node -e \"require('nan')\")",

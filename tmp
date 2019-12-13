@@ -1,0 +1,185 @@
+io
+>> Going deeper
+stderr
+output
+close
+open
+flush
+stdout
+read
+input
+write
+tmpfile
+stdin
+popen
+type
+lines
+<< Went back
+loadfile
+package
+>> Going deeper
+cpath
+config
+loaded
+>> Going deeper
+io
+>> Going deeper
+stderr
+output
+close
+open
+flush
+stdout
+read
+input
+write
+tmpfile
+stdin
+popen
+type
+lines
+<< Went back
+bit32
+>> Going deeper
+lrotate
+extract
+band
+bxor
+lshift
+rshift
+rrotate
+bnot
+replace
+btest
+bor
+arshift
+<< Went back
+string
+>> Going deeper
+format
+match
+gmatch
+find
+char
+upper
+len
+gsub
+reverse
+byte
+unpack
+packsize
+pack
+sub
+rep
+lower
+dump
+<< Went back
+os
+>> Going deeper
+clock
+difftime
+getenv
+execute
+exit
+date
+tmpname
+setlocale
+time
+rename
+remove
+<< Went back
+coroutine
+>> Going deeper
+isyieldable
+yield
+status
+resume
+wrap
+create
+running
+<< Went back
+math
+>> Going deeper
+random
+log
+sin
+cos
+asin
+fmod
+tan
+maxinteger
+tointeger
+floor
+ult
+pow
+abs
+ldexp
+atan
+acos
+deg
+randomseed
+mininteger
+log10
+pi
+huge
+min
+ceil
+tanh
+frexp
+exp
+atan2
+sqrt
+type
+rad
+modf
+sinh
+max
+cosh
+<< Went back
+debug
+>> Going deeper
+gethook
+setuservalue
+traceback
+getmetatable
+getregistry
+upvaluejoin
+setupvalue
+setmetatable
+setlocal
+getlocal
+getupvalue
+sethook
+upvalueid
+debug
+getinfo
+getuservalue
+<< Went back
+utf8
+>> Going deeper
+char
+charpattern
+len
+codepoint
+offset
+codes
+<< Went back
+table
+>> Going deeper
+move
+sort
+unpack
+concat
+remove
+insert
+pack
+<< Went back
+package
+>> Going deeper
+cpath
+config
+loaded
+>> Going deeper
+io
+>> Going deeper
+<< Went back

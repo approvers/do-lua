@@ -19,28 +19,27 @@ module.exports = {
     return new Promise((resolve) => {
       lua_js.doString(program, resolve);
     });
+  },
+
+  loadProgram(program) {
+    return State.fromProgram(program);
   }
 };
 
-function loadProgram(program) {
-  return LusState.from_program(program);
-}
-
-class LusState {
+class State {
   state;
-  parsed = false;
 
-  static from_file(file_name) {}
+  static fromProgram(program) {
+    const obj = new State();
+    obj.state = lua_js.loadProgram(program);
+    return obj;
+  }
 
-  static from_program(program) {
-    state = lua_js.loadString(program);
+  setTable(name, obj) {
+    this.state.setTable(name, obj);
   }
 
   run() {
-    lua_js.parseState(state);
-
-    parsed = true;
+    return new Promise((resolve) => this.state.run(resolve));
   }
-
-  call(name, ...args) {}
 }
