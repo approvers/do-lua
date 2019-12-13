@@ -13,17 +13,17 @@ using Nan::HandleScope;
 using Nan::New;
 using Nan::Null;
 using Nan::To;
+using Nan::Utf8String;
 using v8::Context;
 using v8::Function;
 using v8::Local;
 using v8::Number;
-using v8::String;
 using v8::Value;
 
-int do_string(std::string const &program) {
+int do_string(char const *program) {
   lua_State *L = luaL_newstate();
   luaL_openlibs(L);
-  int ret = luaL_dostring(L, program.c_str());
+  int ret = luaL_dostring(L, program);
   if (ret != 0) {
     std::cerr << lua_tostring(L, -1) << "\n";
   }
@@ -41,7 +41,7 @@ public:
       : Nan::AsyncWorker(callback), program(program), ret(0) {}
   ~DoStringWorker() = default;
 
-  void Execute() override { ret = do_string(program); }
+  void Execute() override { ret = do_string(program.c_str()); }
 
   void HandleOKCallback() override {
     Nan::HandleScope scope;
@@ -53,9 +53,6 @@ public:
 };
 
 void do_string_async(const Nan::FunctionCallbackInfo<Value> &args) {
-  auto *iso = args.GetIsolate();
-  Local<Context> ctx = iso->GetCurrentContext();
-
   if (args.Length() < 1 || !args[0]->IsString()) {
     Nan::ThrowTypeError("the string to execute has not specified");
     return;
@@ -66,27 +63,22 @@ void do_string_async(const Nan::FunctionCallbackInfo<Value> &args) {
     return;
   }
 
-  String::Utf8Value utf8_program(iso, args[0]->ToString(ctx).ToLocalChecked());
-  string program(*utf8_program);
+  Utf8String program(args[0]);
 
   Callback *callback = new Callback(To<Function>(args[1]).ToLocalChecked());
 
-  AsyncQueueWorker(new DoStringWorker(callback, program));
+  AsyncQueueWorker(new DoStringWorker(callback, *program));
 }
 
 void do_string_sync(const Nan::FunctionCallbackInfo<Value> &args) {
-  auto *iso = args.GetIsolate();
-  Local<Context> ctx = iso->GetCurrentContext();
-
   if (args.Length() < 1 || !args[0]->IsString()) {
     Nan::ThrowTypeError("the string to execute has not specified");
     return;
   }
 
-  String::Utf8Value utf8_program(iso, args[0]->ToString(ctx).ToLocalChecked());
-  string program(*utf8_program);
+  Utf8String program(args[0]);
 
-  auto ret = static_cast<int32_t>(do_string(program));
+  auto ret = static_cast<int32_t>(do_string(*program));
   args.GetReturnValue().Set(ret);
   return;
 }
