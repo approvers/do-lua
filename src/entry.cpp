@@ -11,6 +11,10 @@ void init(Local<Object> exports) {
                Nan::New<FunctionTemplate>(do_file_sync)
                    ->GetFunction(ctx)
                    .ToLocalChecked());
+  exports->Set(ctx, Nan::New("doFile").ToLocalChecked(),
+               Nan::New<FunctionTemplate>(do_file_async)
+                   ->GetFunction(ctx)
+                   .ToLocalChecked());
 }
 
 NODE_MODULE(lua_js, init);
