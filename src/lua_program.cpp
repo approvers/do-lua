@@ -110,11 +110,11 @@ NAN_METHOD(LuaProgram::set_table) {
 class ProgramRunner : public Nan::AsyncWorker {
 private:
   struct lua_State *L;
-  int ret;
+  int ret = 0;
 
 public:
   ProgramRunner(Nan::Callback *callback, struct lua_State *L)
-      : Nan::AsyncWorker(callback), L(L), ret(0) {}
+      : Nan::AsyncWorker(callback), L(L) {}
   ~ProgramRunner() = default;
 
   void Execute() override { ret = lua_pcall(L, 0, 0, 0); }
@@ -128,64 +128,57 @@ public:
     }
 
     lua_pushglobaltable(L);
-    Local<Object> table = extract(4);
+    Local<Object> table = extract(-2, 4);
     lua_pop(L, 1);
 
     Local<Value> argv[] = {table};
     callback->Call(1, argv, async_resource);
   }
 
-  Local<Object> extract(int depth) {
+  Local<Object> extract(int index, int depth) {
     Local<Object> table = Nan::New<Object>();
     lua_pushnil(L);
-    while (lua_next(L, -2)) {
+    while (lua_next(L, index) != 0) {
       Local<Value> key;
       switch (lua_type(L, -2)) { // key
       case LUA_TNUMBER: {
-        auto num = static_cast<int32_t>(lua_tointeger(L, -2));
-        key = Nan::New<v8::Int32>(num);
+        auto num = static_cast<double>(lua_tonumber(L, -2));
+        key = Nan::New<v8::Number>(num);
         if (Nan::Has(table, num).FromMaybe(false)) {
           lua_pop(L, 1);
           continue;
         }
       } break;
       case LUA_TSTRING: {
-        key = Nan::New(lua_tostring(L, -2)).ToLocalChecked();
-        Utf8String name_utf8(key);
-        std::string name(*name_utf8);
-        if (Nan::Has(table, To<String>(key).ToLocalChecked())
-                .FromMaybe(false) ||
-            name == "_G") {
+        std::string key_str(lua_tostring(L, -2));
+        key = Nan::New(key_str.c_str()).ToLocalChecked();
+        if (key_str == "_G" || key_str == "package") {
           lua_pop(L, 1);
           continue;
         }
-        std::cerr << lua_tostring(L, -2) << "\n";
       } break;
-      default:
-        lua_pop(L, 1);
-        continue;
       }
+
       Local<Value> value;
       switch (lua_type(L, -1)) { // value
       case LUA_TNUMBER:
-        value = Nan::New<v8::Int32>(static_cast<int32_t>(lua_tointeger(L, -1)));
+        value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
         break;
-      case LUA_TSTRING:
-        value = Nan::New(lua_tostring(L, -1)).ToLocalChecked();
-        break;
+      case LUA_TSTRING: {
+        std::string value_str(lua_tostring(L, -1));
+        value = Nan::New(value_str).ToLocalChecked();
+      } break;
       case LUA_TBOOLEAN:
         value = Nan::New(lua_toboolean(L, -1));
         break;
       case LUA_TTABLE:
-        std::cerr << ">> Going deeper\n";
         if (0 < depth) {
-          // value = extract(depth - 1); This doesn't work well now :(
+          value = extract(-2, depth - 1);
         }
-        std::cerr << "<< Went back\n";
         break;
       default:
-        lua_pop(L, 1);
-        continue;
+        value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
+        break;
       }
       Nan::Set(table, key, value);
       lua_pop(L, 1);

@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.js": "javascriptreact",
+    "*.gyp": "json",
+    "string": "cpp",
+    "typeindex": "cpp",
+    "typeinfo": "cpp",
+    "__locale": "cpp"
+  }
+}
