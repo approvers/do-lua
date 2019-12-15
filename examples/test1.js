@@ -1,3 +1,5 @@
+// Load Lua script file
+
 const lua_js = require('../main');
 
 const file = __dirname + '/test1.lua';

@@ -1,3 +1,5 @@
+// Execute a program of string
+
 const lua_js = require('../main');
 
 const program = `

@@ -1,14 +1,19 @@
-// Pass a table & operations
+// Pass functions & callback
 
 const lua_js = require('../main');
 
 const state = lua_js.loadProgram(`
-obj.ox = 50
+obj.mes("Hello, World!")
 `);
 
 console.log('Loaded the program');
 
-state.setTable('obj', {ox: 0});
+state.setTable('obj', {
+  _message: '',
+  mes(text) {
+    this._message += text;
+  }
+});
 
 console.log('Set the table');
 

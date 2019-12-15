@@ -11,13 +11,74 @@ using Nan::Persistent;
 using Nan::To;
 using Nan::Utf8String;
 using v8::Array;
+using v8::Boolean;
 using v8::Context;
 using v8::Function;
 using v8::FunctionTemplate;
 using v8::Local;
+using v8::Number;
 using v8::Object;
 using v8::String;
 using v8::Value;
+
+Local<Value> lua2js(struct lua_State *L, int i) {
+  switch (lua_type(L, i)) {
+  case LUA_TNUMBER:
+    return Nan::New<Number>(lua_tonumber(L, i));
+    break;
+  case LUA_TSTRING:
+    return Nan::New<String>(lua_tostring(L, i)).ToLocalChecked();
+    break;
+  case LUA_TBOOLEAN:
+    return Nan::New<Boolean>(lua_toboolean(L, i));
+    break;
+  default:
+    return Nan::Null();
+    break;
+  }
+}
+
+void js2lua(Local<Value> value, struct lua_State *L) {
+  if (value->IsBoolean()) {
+    auto boolean = To<bool>(value).FromJust();
+    lua_pushboolean(L, boolean);
+    return;
+  }
+  if (value->IsInt32()) {
+    auto int32 = To<int32_t>(value).FromJust();
+    lua_pushinteger(L, int32);
+    return;
+  }
+  if (value->IsUint32()) {
+    auto uint32 = To<uint32_t>(value).FromJust();
+    lua_pushinteger(L, uint32);
+    return;
+  }
+  if (value->IsNumber()) {
+    auto num = To<double>(value).FromJust();
+    lua_pushnumber(L, num);
+    return;
+  }
+  if (value->IsString()) {
+    Utf8String str(value);
+    lua_pushstring(L, *str);
+    return;
+  }
+  lua_pushnil(L);
+}
+
+int lua2js_bind_gen(lua_State *L) {
+  auto const *callback =
+      static_cast<Callback const *>(lua_topointer(L, lua_upvalueindex(1)));
+  int argc = lua_gettop(L);
+  std::vector<Local<Value>> argv(argc);
+  for (int i = 2; i <= argc; i++) {
+    argv[i - 2] = lua2js(L, i);
+  }
+  auto ret = Nan::Call(*callback, argc, argv.data()).ToLocalChecked();
+  js2lua(ret, L);
+  return 1;
+}
 
 LuaProgram::LuaProgram() {
   L = luaL_newstate();
@@ -84,23 +145,14 @@ NAN_METHOD(LuaProgram::set_table) {
     lua_pushstring(obj->L, *key_str);
 
     Local<Value> prop = Nan::Get(table, key).ToLocalChecked();
-    if (prop->IsBoolean()) {
-      auto boolean = To<bool>(prop).FromJust();
-      lua_pushboolean(obj->L, boolean);
-    } else if (prop->IsInt32()) {
-      auto int32 = To<int32_t>(prop).FromJust();
-      lua_pushinteger(obj->L, int32);
-    } else if (prop->IsUint32()) {
-      auto uint32 = To<uint32_t>(prop).FromJust();
-      lua_pushinteger(obj->L, uint32);
-    } else if (prop->IsNumber()) {
-      auto num = To<double>(prop).FromJust();
-      lua_pushnumber(obj->L, num);
-    } else if (prop->IsString()) {
-      Utf8String str(prop);
-      lua_pushstring(obj->L, *str);
+    if (prop->IsFunction()) {
+      auto f = To<Function>(prop).ToLocalChecked();
+      obj->funcHolder.emplace_back(f);
+      lua_pushinteger(obj->L,
+                      reinterpret_cast<size_t>(&obj->funcHolder.back()));
+      lua_pushcclosure(obj->L, lua2js_bind_gen, 1);
     } else {
-      lua_pushnil(obj->L);
+      js2lua(prop, obj->L);
     }
     lua_settable(obj->L, -3);
   }
