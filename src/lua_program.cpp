@@ -22,23 +22,24 @@ using v8::String;
 using v8::Value;
 
 Local<Value> lua2js(struct lua_State *L, int i) {
+  EscapableHandleScope scope;
   switch (lua_type(L, i)) {
   case LUA_TNUMBER:
-    return Nan::New<Number>(lua_tonumber(L, i));
+    return scope.Escape(Nan::New<Number>(lua_tonumber(L, i)));
     break;
   case LUA_TSTRING:
-    return Nan::New<String>(lua_tostring(L, i)).ToLocalChecked();
+    return scope.Escape(Nan::New<String>(lua_tostring(L, i)).ToLocalChecked());
     break;
   case LUA_TBOOLEAN:
-    return Nan::New<Boolean>(lua_toboolean(L, i));
+    return scope.Escape(Nan::New<Boolean>(lua_toboolean(L, i)));
     break;
   default:
-    return Nan::Null();
+    return scope.Escape(Nan::Null());
     break;
   }
 }
 
-void js2lua(Local<Value> value, struct lua_State *L) {
+void js2lua(Local<Value> const &value, struct lua_State *L) {
   if (value->IsBoolean()) {
     auto boolean = To<bool>(value).FromJust();
     lua_pushboolean(L, boolean);
@@ -67,15 +68,28 @@ void js2lua(Local<Value> value, struct lua_State *L) {
   lua_pushnil(L);
 }
 
-int lua2js_bind_gen(lua_State *L) {
-  auto const *callback =
-      static_cast<Callback const *>(lua_topointer(L, lua_upvalueindex(1)));
+static int lua2js_bind_gen(lua_State *L) {
+  v8::V8::Initialize();
+  HandleScope scope;
+
+  auto *callback =
+      static_cast<Callback *>(lua_touserdata(L, lua_upvalueindex(1)));
+
   int argc = lua_gettop(L);
   std::vector<Local<Value>> argv(argc);
-  for (int i = 2; i <= argc; i++) {
-    argv[i - 2] = lua2js(L, i);
+  for (int i = 1; i <= argc; i++) {
+    argv[i - 1] = lua2js(L, i);
   }
+  std::cerr << "I made args" << std::endl;
+
+  if (callback->IsEmpty()) {
+    std::cerr << "callback is invalid" << std::endl;
+    return 0;
+  }
+
   auto ret = Nan::Call(*callback, argc, argv.data()).ToLocalChecked();
+  std::cerr << "I called callback" << std::endl;
+
   js2lua(ret, L);
   return 1;
 }
@@ -147,9 +161,10 @@ NAN_METHOD(LuaProgram::set_table) {
     Local<Value> prop = Nan::Get(table, key).ToLocalChecked();
     if (prop->IsFunction()) {
       auto f = To<Function>(prop).ToLocalChecked();
-      obj->funcHolder.emplace_back(f);
-      lua_pushinteger(obj->L,
-                      reinterpret_cast<size_t>(&obj->funcHolder.back()));
+
+      auto *callback_block = lua_newuserdata(obj->L, sizeof(Callback));
+      new (callback_block) Callback(f);
+
       lua_pushcclosure(obj->L, lua2js_bind_gen, 1);
     } else {
       js2lua(prop, obj->L);
@@ -188,6 +203,8 @@ public:
   }
 
   Local<Object> extract(int index, int depth) {
+    EscapableHandleScope scope;
+
     Local<Object> table = Nan::New<Object>();
     lua_pushnil(L);
     while (lua_next(L, index) != 0) {
@@ -235,7 +252,7 @@ public:
       Nan::Set(table, key, value);
       lua_pop(L, 1);
     }
-    return table;
+    return scope.Escape(table);
   }
 };
 
