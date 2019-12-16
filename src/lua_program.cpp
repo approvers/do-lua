@@ -69,7 +69,6 @@ void js2lua(Local<Value> const &value, struct lua_State *L) {
 }
 
 static int lua2js_bind_gen(lua_State *L) {
-  v8::V8::Initialize();
   HandleScope scope;
 
   auto *callback =
@@ -80,7 +79,6 @@ static int lua2js_bind_gen(lua_State *L) {
   for (int i = 1; i <= argc; i++) {
     argv[i - 1] = lua2js(L, i);
   }
-  std::cerr << "I made args" << std::endl;
 
   if (callback->IsEmpty()) {
     std::cerr << "callback is invalid" << std::endl;
@@ -88,7 +86,6 @@ static int lua2js_bind_gen(lua_State *L) {
   }
 
   auto ret = Nan::Call(*callback, argc, argv.data()).ToLocalChecked();
-  std::cerr << "I called callback" << std::endl;
 
   js2lua(ret, L);
   return 1;
@@ -174,87 +171,58 @@ NAN_METHOD(LuaProgram::set_table) {
   lua_setglobal(obj->L, *name);
 }
 
-class ProgramRunner : public Nan::AsyncWorker {
-private:
-  struct lua_State *L;
-  int ret = 0;
+Local<Object> extract(int index, int depth, lua_State *L) {
+  EscapableHandleScope scope;
 
-public:
-  ProgramRunner(Nan::Callback *callback, struct lua_State *L)
-      : Nan::AsyncWorker(callback), L(L) {}
-  ~ProgramRunner() = default;
-
-  void Execute() override { ret = lua_pcall(L, 0, 0, 0); }
-
-  void HandleOKCallback() override {
-    Nan::HandleScope scope;
-
-    if (ret != 0) {
-      std::cerr << lua_tostring(L, -1) << "\n";
-      return;
+  Local<Object> table = Nan::New<Object>();
+  lua_pushnil(L);
+  while (lua_next(L, index) != 0) {
+    Local<Value> key;
+    switch (lua_type(L, -2)) { // key
+    case LUA_TNUMBER: {
+      auto num = static_cast<double>(lua_tonumber(L, -2));
+      key = Nan::New<v8::Number>(num);
+      if (Nan::Has(table, num).FromMaybe(false)) {
+        lua_pop(L, 1);
+        continue;
+      }
+    } break;
+    case LUA_TSTRING: {
+      std::string key_str(lua_tostring(L, -2));
+      key = Nan::New(key_str.c_str()).ToLocalChecked();
+      if (key_str == "_G" || key_str == "package") {
+        lua_pop(L, 1);
+        continue;
+      }
+    } break;
     }
 
-    lua_pushglobaltable(L);
-    Local<Object> table = extract(-2, 4);
+    Local<Value> value;
+    switch (lua_type(L, -1)) { // value
+    case LUA_TNUMBER:
+      value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
+      break;
+    case LUA_TSTRING: {
+      std::string value_str(lua_tostring(L, -1));
+      value = Nan::New(value_str).ToLocalChecked();
+    } break;
+    case LUA_TBOOLEAN:
+      value = Nan::New(lua_toboolean(L, -1));
+      break;
+    case LUA_TTABLE:
+      if (0 < depth) {
+        value = extract(-2, depth - 1, L);
+      }
+      break;
+    default:
+      value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
+      break;
+    }
+    Nan::Set(table, key, value);
     lua_pop(L, 1);
-
-    Local<Value> argv[] = {table};
-    callback->Call(1, argv, async_resource);
   }
-
-  Local<Object> extract(int index, int depth) {
-    EscapableHandleScope scope;
-
-    Local<Object> table = Nan::New<Object>();
-    lua_pushnil(L);
-    while (lua_next(L, index) != 0) {
-      Local<Value> key;
-      switch (lua_type(L, -2)) { // key
-      case LUA_TNUMBER: {
-        auto num = static_cast<double>(lua_tonumber(L, -2));
-        key = Nan::New<v8::Number>(num);
-        if (Nan::Has(table, num).FromMaybe(false)) {
-          lua_pop(L, 1);
-          continue;
-        }
-      } break;
-      case LUA_TSTRING: {
-        std::string key_str(lua_tostring(L, -2));
-        key = Nan::New(key_str.c_str()).ToLocalChecked();
-        if (key_str == "_G" || key_str == "package") {
-          lua_pop(L, 1);
-          continue;
-        }
-      } break;
-      }
-
-      Local<Value> value;
-      switch (lua_type(L, -1)) { // value
-      case LUA_TNUMBER:
-        value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
-        break;
-      case LUA_TSTRING: {
-        std::string value_str(lua_tostring(L, -1));
-        value = Nan::New(value_str).ToLocalChecked();
-      } break;
-      case LUA_TBOOLEAN:
-        value = Nan::New(lua_toboolean(L, -1));
-        break;
-      case LUA_TTABLE:
-        if (0 < depth) {
-          value = extract(-2, depth - 1);
-        }
-        break;
-      default:
-        value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
-        break;
-      }
-      Nan::Set(table, key, value);
-      lua_pop(L, 1);
-    }
-    return scope.Escape(table);
-  }
-};
+  return scope.Escape(table);
+}
 
 NAN_METHOD(LuaProgram::start_program) {
   auto *obj = Nan::ObjectWrap::Unwrap<LuaProgram>(info.Holder());
@@ -266,5 +234,16 @@ NAN_METHOD(LuaProgram::start_program) {
 
   Callback *callback = new Callback(To<Function>(info[0]).ToLocalChecked());
 
-  Nan::AsyncQueueWorker(new ProgramRunner(callback, obj->L));
+  auto ret = lua_pcall(obj->L, 0, 0, 0);
+  if (ret != 0) {
+    std::cerr << lua_tostring(obj->L, -1) << "\n";
+    return;
+  }
+
+  lua_pushglobaltable(obj->L);
+  Local<Object> table = extract(-2, 4, obj->L);
+  lua_pop(obj->L, 1);
+
+  Local<Value> argv[] = {table};
+  callback->Call(1, argv);
 }
