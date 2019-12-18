@@ -26,20 +26,20 @@ module.exports = {
   }
 };
 
-class State {
-  state;
-
-  static fromProgram(program) {
-    const obj = new State();
-    obj.state = lua_js.loadProgram(program);
-    return obj;
-  }
-
-  setTable(name, obj) {
-    this.state.setTable(name, obj);
-  }
-
-  run() {
-    return new Promise((resolve) => this.state.run(resolve));
-  }
+function State() {
+  this.state = {};
 }
+
+State.fromProgram = (program) => {
+  const obj = new State();
+  obj.state = lua_js.loadProgram(program);
+  return obj;
+};
+
+State.prototype.setTable = function(name, obj) {
+  this.state.setTable(name, obj);
+};
+
+State.prototype.run = function() {
+  return new Promise((resolve) => this.state.run(resolve));
+};

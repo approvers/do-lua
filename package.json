@@ -5,7 +5,8 @@
   "main": "main.js",
   "scripts": {
     "install": "node-gyp rebuild",
-    "dev": "node-gyp build --debug"
+    "dev": "node-gyp build --debug",
+    "test": "jest"
   },
   "repository": {
     "type": "git",
@@ -26,5 +27,8 @@
   "dependencies": {
     "bindings": "^1.5.0",
     "nan": "^2.14.0"
+  },
+  "devDependencies": {
+    "jest": "^24.9.0"
   }
 }
