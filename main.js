@@ -6,8 +6,11 @@ module.exports = {
   },
 
   doFile(file_name) {
-    return new Promise((resolve) => {
-      lua_js.doFile(file_name, resolve);
+    return new Promise((resolve, reject) => {
+      lua_js.doFile(file_name, (ret) => {
+        if (ret != 0) reject();
+        resolve(0);
+      });
     });
   },
 
@@ -16,8 +19,11 @@ module.exports = {
   },
 
   doString(program) {
-    return new Promise((resolve) => {
-      lua_js.doString(program, resolve);
+    return new Promise((resolve, reject) => {
+      lua_js.doString(program, (ret) => {
+        if (ret != 0) reject();
+        resolve(0);
+      });
     });
   },
 
