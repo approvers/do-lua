@@ -1,4 +1,5 @@
 #include "lua_program.hpp"
+#include "js_table_fn.hpp"
 
 #include <iostream>
 #include <lua/lua.hpp>
@@ -74,7 +75,7 @@ static int lua2js_bind_gen(lua_State *L) {
   HandleScope scope;
 
   auto *callback =
-      static_cast<Callback *>(lua_touserdata(L, lua_upvalueindex(1)));
+      static_cast<JsTableFn *>(lua_touserdata(L, lua_upvalueindex(1)));
 
   int argc = lua_gettop(L);
   std::vector<Local<Value>> argv(argc);
@@ -82,12 +83,8 @@ static int lua2js_bind_gen(lua_State *L) {
     argv[i - 1] = lua2js(L, i);
   }
 
-  if (callback->IsEmpty()) {
-    std::cerr << "callback is invalid" << std::endl;
-    return 0;
-  }
-
-  auto ret = Nan::Call(*callback, argc, argv.data()).ToLocalChecked();
+  auto ret = callback->Call(argc, argv.data())
+                 .FromMaybe(Nan::Undefined().As<v8::Value>());
 
   js2lua(ret, L);
   return 1;
@@ -163,8 +160,8 @@ NAN_METHOD(LuaProgram::set_table) {
     if (prop->IsFunction()) {
       auto f = To<Function>(prop).ToLocalChecked();
 
-      auto *callback_block = lua_newuserdata(obj->L, sizeof(Callback));
-      new (callback_block) Callback(f);
+      auto *callback_block = lua_newuserdata(obj->L, sizeof(JsTableFn));
+      new (callback_block) JsTableFn(table, f);
 
       lua_pushcclosure(obj->L, lua2js_bind_gen, 1);
     } else {
