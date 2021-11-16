@@ -3,6 +3,7 @@
 #include <iostream>
 #include <lua/lua.hpp>
 
+using Nan::AsyncResource;
 using Nan::Callback;
 using Nan::EscapableHandleScope;
 using Nan::FunctionCallbackInfo;
@@ -236,7 +237,6 @@ NAN_METHOD(LuaProgram::start_program) {
   }
 
   auto func = To<Function>(info[0]).ToLocalChecked();
-  Callback *callback = new Callback(func);
 
   auto ret = lua_pcall(obj->L, 0, 0, 0);
   if (ret != 0) {
@@ -249,5 +249,8 @@ NAN_METHOD(LuaProgram::start_program) {
   lua_pop(obj->L, 1);
 
   Local<Value> argv[] = {table};
-  callback->Call(1, argv);
+  AsyncResource async("lua-exec-result");
+
+  v8::Local<v8::Object> target = Nan::New<v8::Object>();
+  async.runInAsyncScope(target, func, 1, argv);
 }
