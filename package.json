@@ -1,6 +1,6 @@
 {
   "name": "lua-js",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "The Lua binding for JavaScript.",
   "main": "main.js",
   "scripts": {
@@ -10,7 +10,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MikuroXina/lua-js.git"
+    "url": "git+https://github.com/approvers/lua-js.git"
   },
   "keywords": [
     "Lua",
@@ -21,9 +21,9 @@
   "license": "Apache-2.0",
   "gypfile": true,
   "bugs": {
-    "url": "https://github.com/MikuroXina/lua-js/issues"
+    "url": "https://github.com/approvers/lua-js/issues"
   },
-  "homepage": "https://github.com/MikuroXina/lua-js#readme",
+  "homepage": "https://github.com/approvers/lua-js#readme",
   "dependencies": {
     "bindings": "^1.5.0",
     "nan": "^2.14.2"
