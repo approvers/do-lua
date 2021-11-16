@@ -32,11 +32,11 @@ int do_string(char const *program) {
 }
 
 class DoStringWorker : public Nan::AsyncWorker {
-private:
+ private:
   string const program;
   int ret;
 
-public:
+ public:
   DoStringWorker(Nan::Callback *callback, string program)
       : Nan::AsyncWorker(callback), program(program), ret(0) {}
   ~DoStringWorker() = default;

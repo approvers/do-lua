@@ -33,11 +33,11 @@ int do_file(char const *file_name) {
 }
 
 class DoFileWorker : public Nan::AsyncWorker {
-private:
+ private:
   string const file_name;
   int ret;
 
-public:
+ public:
   DoFileWorker(Nan::Callback *callback, string file_name)
       : Nan::AsyncWorker(callback), file_name(file_name), ret(0) {}
   ~DoFileWorker() = default;

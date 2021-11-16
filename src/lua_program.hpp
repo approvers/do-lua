@@ -4,7 +4,7 @@
 #include <nan.h>
 
 class LuaProgram : public Nan::ObjectWrap {
-private:
+ private:
   static inline Nan::Persistent<v8::Function> constructor;
 
   struct lua_State *L;
@@ -15,9 +15,9 @@ private:
   LuaProgram();
   ~LuaProgram();
 
-public:
+ public:
   static NAN_MODULE_INIT(Init);
   static NAN_METHOD(from_program);
 };
 
-#endif // LUA_JS_LUA_PROGRAM_HPP
+#endif  // LUA_JS_LUA_PROGRAM_HPP

@@ -24,18 +24,19 @@ using v8::Value;
 Local<Value> lua2js(struct lua_State *L, int i) {
   EscapableHandleScope scope;
   switch (lua_type(L, i)) {
-  case LUA_TNUMBER:
-    return scope.Escape(Nan::New<Number>(lua_tonumber(L, i)));
-    break;
-  case LUA_TSTRING:
-    return scope.Escape(Nan::New<String>(lua_tostring(L, i)).ToLocalChecked());
-    break;
-  case LUA_TBOOLEAN:
-    return scope.Escape(Nan::New<Boolean>(lua_toboolean(L, i)));
-    break;
-  default:
-    return scope.Escape(Nan::Null());
-    break;
+    case LUA_TNUMBER:
+      return scope.Escape(Nan::New<Number>(lua_tonumber(L, i)));
+      break;
+    case LUA_TSTRING:
+      return scope.Escape(
+          Nan::New<String>(lua_tostring(L, i)).ToLocalChecked());
+      break;
+    case LUA_TBOOLEAN:
+      return scope.Escape(Nan::New<Boolean>(lua_toboolean(L, i)));
+      break;
+    default:
+      return scope.Escape(Nan::Null());
+      break;
   }
 }
 
@@ -96,7 +97,9 @@ LuaProgram::LuaProgram() {
   luaL_openlibs(L);
 }
 
-LuaProgram::~LuaProgram() { lua_close(L); }
+LuaProgram::~LuaProgram() {
+  lua_close(L);
+}
 
 NAN_MODULE_INIT(LuaProgram::Init) {
   Local<FunctionTemplate> tpl = Nan::New<FunctionTemplate>(from_program);
@@ -178,45 +181,45 @@ Local<Object> extract(int index, int depth, lua_State *L) {
   lua_pushnil(L);
   while (lua_next(L, index) != 0) {
     Local<Value> key;
-    switch (lua_type(L, -2)) { // key
-    case LUA_TNUMBER: {
-      auto num = static_cast<double>(lua_tonumber(L, -2));
-      key = Nan::New<v8::Number>(num);
-      if (Nan::Has(table, num).FromMaybe(false)) {
-        lua_pop(L, 1);
-        continue;
-      }
-    } break;
-    case LUA_TSTRING: {
-      std::string key_str(lua_tostring(L, -2));
-      key = Nan::New(key_str.c_str()).ToLocalChecked();
-      if (key_str == "_G" || key_str == "package") {
-        lua_pop(L, 1);
-        continue;
-      }
-    } break;
+    switch (lua_type(L, -2)) {  // key
+      case LUA_TNUMBER: {
+        auto num = static_cast<double>(lua_tonumber(L, -2));
+        key = Nan::New<v8::Number>(num);
+        if (Nan::Has(table, num).FromMaybe(false)) {
+          lua_pop(L, 1);
+          continue;
+        }
+      } break;
+      case LUA_TSTRING: {
+        std::string key_str(lua_tostring(L, -2));
+        key = Nan::New(key_str.c_str()).ToLocalChecked();
+        if (key_str == "_G" || key_str == "package") {
+          lua_pop(L, 1);
+          continue;
+        }
+      } break;
     }
 
     Local<Value> value;
-    switch (lua_type(L, -1)) { // value
-    case LUA_TNUMBER:
-      value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
-      break;
-    case LUA_TSTRING: {
-      std::string value_str(lua_tostring(L, -1));
-      value = Nan::New(value_str).ToLocalChecked();
-    } break;
-    case LUA_TBOOLEAN:
-      value = Nan::New(lua_toboolean(L, -1));
-      break;
-    case LUA_TTABLE:
-      if (0 < depth) {
-        value = extract(-2, depth - 1, L);
-      }
-      break;
-    default:
-      value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
-      break;
+    switch (lua_type(L, -1)) {  // value
+      case LUA_TNUMBER:
+        value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
+        break;
+      case LUA_TSTRING: {
+        std::string value_str(lua_tostring(L, -1));
+        value = Nan::New(value_str).ToLocalChecked();
+      } break;
+      case LUA_TBOOLEAN:
+        value = Nan::New(lua_toboolean(L, -1));
+        break;
+      case LUA_TTABLE:
+        if (0 < depth) {
+          value = extract(-2, depth - 1, L);
+        }
+        break;
+      default:
+        value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
+        break;
     }
     Nan::Set(table, key, value);
     lua_pop(L, 1);
@@ -232,7 +235,8 @@ NAN_METHOD(LuaProgram::start_program) {
     return;
   }
 
-  Callback *callback = new Callback(To<Function>(info[0]).ToLocalChecked());
+  auto func = To<Function>(info[0]).ToLocalChecked();
+  Callback *callback = new Callback(func);
 
   auto ret = lua_pcall(obj->L, 0, 0, 0);
   if (ret != 0) {
