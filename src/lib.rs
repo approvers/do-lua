@@ -1,11 +1,15 @@
 use mlua::{Error, Lua};
-use neon::prelude::*;
+use neon::{handle::Managed, prelude::*};
 
-fn convert_err<'a>(
-    res: mlua::Result<()>,
-    cx: &mut FunctionContext<'a>,
-) -> JsResult<'a, JsUndefined> {
-    res.map(|_| cx.undefined()).or_else(|err| {
+mod convert;
+
+use convert::lua_to_js;
+
+fn convert_err<'j, T: Managed>(
+    res: mlua::Result<Handle<'j, T>>,
+    cx: &mut impl Context<'j>,
+) -> JsResult<'j, T> {
+    res.or_else(|err| {
         if let Error::SyntaxError { message, .. } = err {
             cx.throw_type_error(message)
         } else {
@@ -14,10 +18,12 @@ fn convert_err<'a>(
     })
 }
 
-fn do_string_sync(mut cx: FunctionContext) -> JsResult<JsUndefined> {
+fn do_string_sync(mut cx: FunctionContext) -> JsResult<JsValue> {
     let lua = Lua::new();
     convert_err(
-        lua.load(&cx.argument::<JsString>(0)?.value(&mut cx)).exec(),
+        lua.load(&cx.argument::<JsString>(0)?.value(&mut cx))
+            .eval()
+            .map(|lua| lua_to_js(lua, &mut cx)),
         &mut cx,
     )
 }
