@@ -1,0 +1,17 @@
+[package]
+name = "lua-js"
+version = "0.1.0"
+description = "The Lua runtime for Node.js."
+authors = ["MikuroXina"]
+license = "Apache-2.0"
+edition = "2021"
+exclude = ["index.node"]
+
+[lib]
+crate-type = ["cdylib"]
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+mlua = { version = "0.6.6", features = ["lua54", "vendored"] }
+neon = { version = "0.9.1", default-features = false, features = ["napi-6"] }
