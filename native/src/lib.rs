@@ -28,21 +28,6 @@ fn convert_err<'j>(
     }
 }
 
-fn load_program(mut cx: FunctionContext) -> JsResult<ProgramBox> {
-    let program = cx.argument::<JsString>(0)?.value(&mut cx);
-    Program::new(&mut cx, program)
-}
-
-fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let program = *cx.argument::<ProgramBox>(0)?;
-    let name = cx.argument::<JsString>(1)?.value(&mut cx);
-    let table = cx.argument::<JsObject>(2)?;
-
-    program.borrow_mut().set_table(&mut cx, name, table)?;
-
-    Ok(cx.undefined())
-}
-
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("doStringSync", do_string_sync)?;
@@ -51,5 +36,6 @@ fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("doFileAsync", do_file_async)?;
     cx.export_function("loadProgram", load_program)?;
     cx.export_function("setTable", set_table)?;
+    cx.export_function("run", run)?;
     Ok(())
 }
