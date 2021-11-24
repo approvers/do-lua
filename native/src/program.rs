@@ -90,7 +90,7 @@ impl Program {
                     let callback = callback.into_inner(&mut cx);
                     let this = cx.undefined();
                     let res = table.as_js(&mut cx)?;
-                    callback.call(&mut cx, this, vec![res])?;
+                    callback.call(&mut cx, this, [res])?;
                 }
                 state.pop(1);
                 Ok(())
