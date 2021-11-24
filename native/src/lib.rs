@@ -38,7 +38,7 @@ fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let name = cx.argument::<JsString>(1)?.value(&mut cx);
     let table = cx.argument::<JsObject>(2)?;
 
-    program.borrow_mut().set_table(&mut cx, &name, table)?;
+    program.borrow_mut().set_table(&mut cx, name, table)?;
 
     Ok(cx.undefined())
 }
