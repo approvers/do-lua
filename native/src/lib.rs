@@ -1,6 +1,10 @@
 use lua::{State, ThreadStatus};
 use neon::prelude::*;
 
+mod do_string;
+
+use do_string::*;
+
 fn convert_err<'j>(
     status: ThreadStatus,
     state: &mut State,
@@ -18,14 +22,6 @@ fn convert_err<'j>(
     } else {
         cx.throw_error(format!("lua exec failed: {:?}", err))
     }
-}
-
-fn do_string_sync(mut cx: FunctionContext) -> JsResult<JsValue> {
-    let program = cx.argument::<JsString>(0)?.value(&mut cx);
-    let mut state = State::new();
-    state.open_libs();
-    let status = state.do_string(&program);
-    convert_err(status, &mut state, &mut cx)
 }
 
 #[neon::main]
