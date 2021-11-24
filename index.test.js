@@ -34,17 +34,14 @@ obj.mes("Hello, World!")
 `);
   const table = {
     _message: '',
-    mes: (text) => {
-      table._message += text;
+    mes(text) {
+      this._message += text;
     }
   };
   state.setTable('obj', table);
 
   state.run().then((G) => {
-    // G.obj has not changed because values are not binded by references
-    // but called function is on JavaScript
-    // so we must check _message of table
-    expect(table._message).toBe('Hello, World!');
+    expect(G.obj._message).toBe('Hello, World!');
     done();
   });
 });
