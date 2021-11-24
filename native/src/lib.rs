@@ -14,7 +14,7 @@ fn convert_err<'j>(
     state: &mut State,
     cx: &mut impl Context<'j>,
 ) -> JsResult<'j, JsValue> {
-    if let ThreadStatus::Ok = status {
+    if !status.is_err() {
         return Ok(cx.undefined().as_value(cx));
     }
     let err = state
