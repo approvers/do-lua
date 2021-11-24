@@ -13,5 +13,8 @@ crate-type = ["cdylib"]
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-mlua = { version = "0.6.6", features = ["lua54", "vendored"] }
-neon = { version = "0.9.1", default-features = false, features = ["napi-6"] }
+lua = { version = "0.0.10" }
+neon = { version = "0.9.1", default-features = false, features = [
+    "napi-6",
+    "channel-api",
+] }
