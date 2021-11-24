@@ -1,8 +1,10 @@
 use lua::{State, ThreadStatus};
 use neon::prelude::*;
 
+mod do_file;
 mod do_string;
 
+use do_file::*;
 use do_string::*;
 
 fn convert_err<'j>(
@@ -28,5 +30,7 @@ fn convert_err<'j>(
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("doStringSync", do_string_sync)?;
     cx.export_function("doStringAsync", do_string_async)?;
+    cx.export_function("doFileSync", do_file_sync)?;
+    cx.export_function("doFileAsync", do_file_async)?;
     Ok(())
 }
