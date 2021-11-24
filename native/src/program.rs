@@ -1,13 +1,12 @@
 use crate::convert_err;
 
-use lua::State;
+use lua::{State, ToLua};
 use neon::prelude::*;
 use std::cell::RefCell;
 
-mod convert;
-mod extract;
+mod table;
 
-use convert::*;
+use table::Table;
 
 pub struct Program {
     state: State,
@@ -28,25 +27,11 @@ impl Program {
     pub fn set_table<'j>(
         &mut self,
         cx: &mut impl Context<'j>,
-        name: &str,
+        name: String,
         table: Handle<'j, JsObject>,
     ) -> NeonResult<()> {
-        self.state.new_table();
-
-        let keys = table.get_own_property_names(cx)?;
-        for key in keys.to_vec(cx)? {
-            self.state.push_string(&key.to_string(cx)?.value(cx));
-
-            let value = table.get(cx, key)?;
-            if value.is_a::<JsFunction, _>(cx) {
-                todo!();
-            } else {
-                js2lua(&mut self.state, cx, value);
-            }
-            self.state.set_table(-3);
-        }
-        self.state.set_global(name);
-
+        let table = Table::from_js(cx, name, table)?;
+        table.to_lua(&mut self.state);
         Ok(())
     }
 }
