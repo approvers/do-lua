@@ -24,7 +24,7 @@ pub fn do_string_async(mut cx: FunctionContext) -> JsResult<JsValue> {
         channel.send(move |mut cx| {
             let callback = callback.into_inner(&mut cx);
             let this = cx.undefined();
-            let args = vec![convert_err(status, &mut state, &mut cx)?];
+            let args = [convert_err(status, &mut state, &mut cx)?];
 
             callback.call(&mut cx, this, args)?;
 
