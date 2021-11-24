@@ -34,11 +34,11 @@ fn load_program(mut cx: FunctionContext) -> JsResult<ProgramBox> {
 }
 
 fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let program = cx.argument::<ProgramBox>(0)?;
+    let program = *cx.argument::<ProgramBox>(0)?;
     let name = cx.argument::<JsString>(1)?.value(&mut cx);
     let table = cx.argument::<JsObject>(2)?;
 
-    (**program).borrow_mut().set_table(&mut cx, &name, table)?;
+    program.borrow_mut().set_table(&mut cx, &name, table)?;
 
     Ok(cx.undefined())
 }
