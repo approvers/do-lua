@@ -1,22 +1,22 @@
-const lua_js = require('./main');
+const { doFile, doString, loadProgram } = require('.');
 
 test('doString', () => {
   const program = `
 print("Hello, World!")
 `;
 
-  return expect(lua_js.doString(program)).resolves.toBe(0);
+  return expect(doString(program)).resolves.toBe(undefined);
 });
 
 test('doFile', () => {
   const path = require('path');
   const file = path.join(__dirname, 'examples', 'test1.lua').toString();
 
-  return expect(lua_js.doFile(file)).resolves.toBe(0);
+  return expect(doFile(file)).resolves.toBe(undefined);
 });
 
 test('Passing table', (done) => {
-  const state = lua_js.loadProgram(`
+  const state = loadProgram(`
 obj.ox = 50
 `);
 
@@ -29,7 +29,7 @@ obj.ox = 50
 });
 
 test('Passing function', (done) => {
-  const state = lua_js.loadProgram(`
+  const state = loadProgram(`
 obj.mes("Hello, World!")
 `);
   const table = {
