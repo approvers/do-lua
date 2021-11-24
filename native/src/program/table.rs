@@ -39,7 +39,10 @@ impl Table {
             } else if let Ok(o) = value.downcast::<JsObject, _>(cx) {
                 Entry::Table(Self::from_js(cx, key.clone(), o)?)
             } else {
-                return cx.throw_type_error("found value of unsupported type");
+                return cx.throw_type_error(&format!(
+                    "found value of unsupported type on the key: {:?}",
+                    key
+                ));
             };
 
             table.insert(key, value);
