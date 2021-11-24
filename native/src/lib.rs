@@ -27,5 +27,6 @@ fn convert_err<'j>(
 #[neon::main]
 fn main(mut cx: ModuleContext) -> NeonResult<()> {
     cx.export_function("doStringSync", do_string_sync)?;
+    cx.export_function("doStringAsync", do_string_async)?;
     Ok(())
 }
