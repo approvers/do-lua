@@ -4,6 +4,6 @@ declare function doStringSync(program: string): number;
 declare function doString(program: string): Promise<void>;
 declare function loadProgram(program: string): State;
 declare class State {
-  setTable(table: object): void;
+  setTable(name: string, table: object): void;
   run(): Promise<object>;
 }
