@@ -85,14 +85,13 @@ impl Program {
             channel.send(move |mut cx| {
                 convert_err(status1, &mut state, &mut cx)?;
                 convert_err(status2, &mut state, &mut cx)?;
-                state.push_global_table();
-                if let Some(table) = Table::from_lua(&mut state, -2) {
+                if let Some(table) = Table::from_lua(&mut state, -1) {
+                    eprintln!("table: {:?}", table);
                     let callback = callback.into_inner(&mut cx);
                     let this = cx.undefined();
                     let res = table.as_js(&mut cx)?;
                     callback.call(&mut cx, this, vec![res])?;
                 }
-                state.pop(1);
                 Ok(())
             });
         });

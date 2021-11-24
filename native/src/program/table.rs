@@ -75,8 +75,10 @@ impl FromLua for Table {
         let mut table = HashMap::default();
         state.push_nil();
         while state.next(index) {
-            const KEY_INDEX: Index = -2;
-            const VALUE_INDEX: Index = -1;
+            state.push_value(-2);
+
+            const KEY_INDEX: Index = -1;
+            const VALUE_INDEX: Index = -2;
 
             let key = match state.type_of(KEY_INDEX)? {
                 lua::Type::Number => state.to_number(KEY_INDEX).to_string(),
@@ -99,8 +101,8 @@ impl FromLua for Table {
                 lua::Type::None | lua::Type::Nil => Entry::Nil,
                 lua::Type::Boolean => Entry::Boolean(state.to_bool(VALUE_INDEX)),
                 lua::Type::Number => Entry::Number(state.to_number(VALUE_INDEX)),
-                lua::Type::String => Entry::String(state.to_str(KEY_INDEX)?.into()),
-                lua::Type::Table => Entry::Table(Self::from_lua(state, index)?),
+                lua::Type::String => Entry::String(state.to_str(VALUE_INDEX)?.into()),
+                lua::Type::Table => Entry::Table(Self::from_lua(state, VALUE_INDEX)?),
                 lua::Type::Function => todo!(),
                 ty => {
                     eprintln!("found the value of unsupported type: {:?}", ty);
@@ -108,8 +110,11 @@ impl FromLua for Table {
                     continue;
                 }
             };
+            eprintln!("{:?}: {:?}", key, value);
             table.insert(key, value);
+            state.pop(2);
         }
+        state.pop(1);
         Self {
             name: "__global".into(),
             table,
