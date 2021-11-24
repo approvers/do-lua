@@ -81,7 +81,7 @@ impl FromLua for Table {
             let key = match state.type_of(KEY_INDEX)? {
                 lua::Type::Number => state.to_number(KEY_INDEX).to_string(),
                 lua::Type::String => {
-                    let key_str = state.to_str(KEY_INDEX).unwrap();
+                    let key_str = state.to_str_in_place(KEY_INDEX).unwrap();
                     if key_str == "_G" || key_str == "package" {
                         state.pop(1);
                         continue;
@@ -99,7 +99,7 @@ impl FromLua for Table {
                 lua::Type::None | lua::Type::Nil => Entry::Nil,
                 lua::Type::Boolean => Entry::Boolean(state.to_bool(VALUE_INDEX)),
                 lua::Type::Number => Entry::Number(state.to_number(VALUE_INDEX)),
-                lua::Type::String => Entry::String(state.to_str(VALUE_INDEX)?.into()),
+                lua::Type::String => Entry::String(state.to_str_in_place(VALUE_INDEX)?.into()),
                 lua::Type::Table => Entry::Table(Self::from_lua(state, VALUE_INDEX)?),
                 lua::Type::Function => todo!(),
                 ty => {
