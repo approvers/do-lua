@@ -74,11 +74,9 @@ impl FromLua for Table {
     fn from_lua(state: &mut State, index: Index) -> Option<Self> {
         let mut table = HashMap::default();
         state.push_nil();
-        while state.next(index) {
-            state.push_value(-2);
-
-            const KEY_INDEX: Index = -1;
-            const VALUE_INDEX: Index = -2;
+        while state.next(index - 1) {
+            const KEY_INDEX: Index = -2;
+            const VALUE_INDEX: Index = -1;
 
             let key = match state.type_of(KEY_INDEX)? {
                 lua::Type::Number => state.to_number(KEY_INDEX).to_string(),
@@ -112,9 +110,8 @@ impl FromLua for Table {
             };
             eprintln!("{:?}: {:?}", key, value);
             table.insert(key, value);
-            state.pop(2);
+            state.pop(1);
         }
-        state.pop(1);
         Self {
             name: "__global".into(),
             table,
