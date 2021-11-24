@@ -123,7 +123,7 @@ impl ToLua for Table {
         state.new_table();
 
         for (key, value) in self.table.iter() {
-            state.push_string(&key);
+            state.push_string(key);
 
             match value {
                 Entry::Nil => state.push_nil(),
