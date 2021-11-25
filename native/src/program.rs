@@ -2,7 +2,10 @@ use crate::convert_err;
 
 use lua::{FromLua, State, ToLua};
 use neon::prelude::*;
-use std::cell::RefCell;
+use std::{
+    cell::RefCell,
+    sync::{Arc, Mutex},
+};
 
 mod table;
 
@@ -35,7 +38,7 @@ pub fn run(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 
 pub struct Program {
     program: String,
-    tables: Vec<Table>,
+    tables: Arc<Mutex<Vec<Table>>>,
 }
 
 pub type ProgramBox = JsBox<RefCell<Program>>;
@@ -47,7 +50,7 @@ impl Program {
         Ok(cx.boxed(
             Self {
                 program,
-                tables: vec![],
+                tables: Mutex::new(vec![]).into(),
             }
             .into(),
         ))
@@ -60,7 +63,7 @@ impl Program {
         table: Handle<'j, JsObject>,
     ) -> NeonResult<()> {
         let table = Table::from_js(cx, name, table)?;
-        self.tables.push(table);
+        self.tables.lock().unwrap().push(table);
         Ok(())
     }
 
@@ -73,11 +76,11 @@ impl Program {
         let callback = callback.root(cx);
 
         let program = self.program.clone();
-        let tables = self.tables.clone();
+        let tables = Arc::clone(&self.tables);
         std::thread::spawn(move || {
             let mut state = State::new();
             let status1 = state.load_string(&program);
-            for table in tables {
+            for table in tables.lock().unwrap().iter() {
                 table.to_lua(&mut state);
             }
             let status2 = state.pcall(0, 0, 0);
