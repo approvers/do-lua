@@ -1,12 +1,11 @@
-use std::sync::Arc;
-
 use lua::{libc::c_int, lua_func, FromLua, Index, State, ToLua};
 use neon::prelude::*;
 use static_assertions::assert_impl_all;
+use std::sync::Arc;
 
 use super::table::Table;
 
-pub type Function = Arc<Box<dyn Fn(Entry) -> Entry + Send + Sync>>;
+pub type Function = Arc<dyn Fn(Entry) -> Entry + Send + Sync>;
 
 pub enum Entry {
     Nil,
