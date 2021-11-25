@@ -1,5 +1,6 @@
 use lua::{FromLua, Index, State, ToLua};
 use neon::prelude::*;
+use static_assertions::assert_impl_all;
 use std::collections::HashMap;
 
 #[derive(Debug)]
@@ -16,6 +17,8 @@ pub struct Table {
     name: String,
     table: HashMap<String, Entry>,
 }
+
+assert_impl_all!(Table: Sync);
 
 impl Table {
     pub fn from_js<'j>(
