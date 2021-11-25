@@ -2,7 +2,7 @@ use lua::{FromLua, Index, State, ToLua};
 use neon::prelude::*;
 use std::collections::HashMap;
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub enum Entry {
     Nil,
     Boolean(bool),
@@ -11,7 +11,7 @@ pub enum Entry {
     Table(Table),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct Table {
     name: String,
     table: HashMap<String, Entry>,
