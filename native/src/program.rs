@@ -7,8 +7,10 @@ use std::{
     sync::{Arc, Mutex},
 };
 
+mod entry;
 mod table;
 
+use entry::Entry;
 use table::Table;
 
 pub fn load_program(mut cx: FunctionContext) -> JsResult<ProgramBox> {
@@ -38,7 +40,7 @@ pub fn run(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 
 pub struct Program {
     program: String,
-    tables: Arc<Mutex<Vec<Table>>>,
+    tables: Arc<Mutex<Vec<(String, Table)>>>,
 }
 
 pub type ProgramBox = JsBox<RefCell<Program>>;
@@ -62,8 +64,8 @@ impl Program {
         name: String,
         table: Handle<'j, JsObject>,
     ) -> NeonResult<()> {
-        let table = Table::from_js(cx, name, table)?;
-        self.tables.lock().unwrap().push(table);
+        let table = Table::from_js(cx, table)?;
+        self.tables.lock().unwrap().push((name, table));
         Ok(())
     }
 
@@ -80,8 +82,10 @@ impl Program {
         std::thread::spawn(move || {
             let mut state = State::new();
             let status1 = state.load_string(&program);
-            for table in tables.lock().unwrap().iter() {
+            for (name, table) in tables.lock().unwrap().iter() {
+                state.new_table();
                 table.to_lua(&mut state);
+                state.set_global(name);
             }
             let status2 = state.pcall(0, 0, 0);
 
@@ -89,10 +93,10 @@ impl Program {
                 convert_err(status1, &mut state, &mut cx)?;
                 convert_err(status2, &mut state, &mut cx)?;
                 state.push_global_table();
-                if let Some(table) = Table::from_lua(&mut state, -1) {
+                if let Some(entry) = Entry::from_lua(&mut state, -1) {
                     let callback = callback.into_inner(&mut cx);
                     let this = cx.undefined();
-                    let res = table.as_js(&mut cx)?;
+                    let res = entry.as_js(&mut cx)?;
                     callback.call(&mut cx, this, [res])?;
                 }
                 state.pop(1);
