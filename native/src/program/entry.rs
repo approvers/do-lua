@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use super::table::Table;
 
-pub type Function = Arc<dyn Fn(Entry) -> Entry + Send + Sync>;
+pub type Function = Arc<dyn Fn(Entry) + Send + Sync>;
 
 pub enum Entry {
     Nil,
@@ -45,7 +45,18 @@ impl Entry {
             } else if let Ok(n) = value.downcast::<JsNumber, _>(cx) {
                 Entry::Number(n.value(cx))
             } else if let Ok(f) = value.downcast::<JsFunction, _>(cx) {
-                todo!()
+                let root = Arc::new(f.root(cx));
+                let channel = cx.channel();
+                Entry::Function(Arc::new(move |args| {
+                    let root = Arc::clone(&root);
+                    channel.send(move |mut cx| {
+                        let f = root.to_inner(&mut cx);
+                        let this = cx.undefined();
+                        let args = args.as_js(&mut cx);
+                        f.call(&mut cx, this, args)?;
+                        Ok(())
+                    });
+                }))
             } else if let Ok(s) = value.downcast::<JsString, _>(cx) {
                 Entry::String(s.value(cx))
             } else if let Ok(o) = value.downcast::<JsObject, _>(cx) {
