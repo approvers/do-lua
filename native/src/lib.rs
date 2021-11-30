@@ -1,5 +1,6 @@
 use lua::{State, ThreadStatus};
 
+mod do_file;
 mod do_string;
 
 pub enum LuaJsError {
