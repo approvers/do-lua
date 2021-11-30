@@ -2,10 +2,9 @@
   "name": "lua-js",
   "version": "1.0.1",
   "description": "The Lua binding for JavaScript.",
-  "main": "main.js",
+  "main": "index.js",
   "scripts": {
-    "install": "node-gyp rebuild",
-    "dev": "node-gyp build --debug",
+    "build": "cd native && nj-cli build",
     "test": "jest"
   },
   "repository": {

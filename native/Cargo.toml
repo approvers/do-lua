@@ -1,0 +1,18 @@
+[package]
+name = "lua-js-native"
+version = "0.1.0"
+edition = "2021"
+description = "The Lua runtime for Node.js."
+authors = ["MikuroXina"]
+license = "Apache-2.0"
+exclude = ["/dist/**"]
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+lua = "0.0.10"
+node-bindgen = { version = "4.0" }
+
+[build-dependencies]
+node-bindgen = { version = "4.0", features = ["build"] }
