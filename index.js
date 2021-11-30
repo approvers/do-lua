@@ -17,7 +17,7 @@ module.exports = {
     doString: native.doStringAsync,
 
     doFileSync: native.doFileSync,
-    doFile: native.doFileASync,
+    doFile: native.doFileAsync,
 
     loadProgram(program) {
         return new StateConstructor(program);
