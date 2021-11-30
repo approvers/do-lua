@@ -14,14 +14,10 @@ StateConstructor.prototype.run = function run() {
 
 module.exports = {
     doStringSync: native.doStringSync,
-    doString(program) {
-        return new Promise((resolve) => native.do_string_async(program, resolve));
-    },
+    doString: native.doStringAsync,
 
     doFileSync: native.doFileSync,
-    doFile(filename) {
-        return new Promise((resolve) => native.doFileAsync(filename, resolve));
-    },
+    doFile: native.doFileASync,
 
     loadProgram(program) {
         return new StateConstructor(program);
