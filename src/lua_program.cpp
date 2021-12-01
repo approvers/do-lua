@@ -107,7 +107,7 @@ NAN_METHOD(LuaProgram::start_program) {
   }
 
   lua_pushglobaltable(obj->L);
-  Local<Object> table = extract(-2, 4, obj->L);
+  Local<Object> table = extract(-1, 4, obj->L);
   lua_pop(obj->L, 1);
 
   Local<Value> argv[] = {table};

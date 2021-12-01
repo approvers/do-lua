@@ -100,7 +100,7 @@ Local<Object> extract(int index, int depth, lua_State *L) {
 
   Local<Object> table = Nan::New<Object>();
   lua_pushnil(L);
-  while (lua_next(L, index) != 0) {
+  while (lua_next(L, index - 1) != 0) {
     auto constexpr KEY_INDEX = -2;
     auto constexpr VALUE_INDEX = -1;
 
