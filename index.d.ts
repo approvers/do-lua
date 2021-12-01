@@ -1,9 +1,9 @@
-declare function doFileSync(file_name: string): number;
+declare function doFileSync(file_name: string): void;
 declare function doFile(file_name: string): Promise<void>;
-declare function doStringSync(program: string): number;
+declare function doStringSync(program: string): void;
 declare function doString(program: string): Promise<void>;
-declare function loadProgram(program: string): State;
 declare class State {
-  setTable(table: object): void;
-  run(): Promise<object>;
+  new(program: string): State;
+  setTable(name: string, table: Record<string, unknown>): void;
+  run(): Promise<Record<string, unknown>>;
 }
