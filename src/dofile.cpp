@@ -78,5 +78,4 @@ void do_file_sync(const Nan::FunctionCallbackInfo<Value> &args) {
 
   auto ret = static_cast<int32_t>(do_file(*file_name));
   args.GetReturnValue().Set(ret);
-  return;
 }

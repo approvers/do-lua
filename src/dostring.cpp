@@ -78,5 +78,4 @@ void do_string_sync(const Nan::FunctionCallbackInfo<Value> &args) {
 
   auto ret = static_cast<int32_t>(do_string(*program));
   args.GetReturnValue().Set(ret);
-  return;
 }
