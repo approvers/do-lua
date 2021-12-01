@@ -33,15 +33,13 @@ test('Passing function', (done) => {
 obj.mes("Hello, World!")
 `);
   const table = {
-    _message: '',
-    mes(text)  {
-      this._message += text;
+    mes: (text) =>  {
+      expect(text).toBe('Hello, World!');
     }
   };
   state.setTable('obj', table);
 
-  state.run().then((G) => {
-    expect(G.obj._message).toBe('Hello, World!');
+  state.run().then(() => {
     done();
   });
 });
