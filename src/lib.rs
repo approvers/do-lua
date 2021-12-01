@@ -1,14 +1,17 @@
-use napi::{JsObject, Result as NResult};
+use napi::{Env, JsObject, Result as NResult};
 use napi_derive::module_exports;
 
 mod do_string;
+mod state;
 
 #[module_exports]
-fn init(mut exports: JsObject) -> NResult<()> {
+fn init(mut exports: JsObject, env: Env) -> NResult<()> {
     use do_string::*;
 
     exports.create_named_method("doStringSync", do_string_sync)?;
     exports.create_named_method("doString", do_string_async)?;
+
+    state::export_state(&mut exports, &env)?;
 
     Ok(())
 }
