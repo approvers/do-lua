@@ -18,8 +18,7 @@ namespace {
 static Nan::Persistent<Function> constructor;
 }
 
-LuaProgram::LuaProgram() {
-  L = luaL_newstate();
+LuaProgram::LuaProgram() : L(luaL_newstate()) {
   luaL_openlibs(L);
 }
 
