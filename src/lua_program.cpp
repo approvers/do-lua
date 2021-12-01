@@ -6,14 +6,11 @@
 using Nan::AsyncResource;
 using Nan::Callback;
 using Nan::EscapableHandleScope;
-using Nan::FunctionCallbackInfo;
 using Nan::HandleScope;
-using Nan::Persistent;
 using Nan::To;
 using Nan::Utf8String;
 using v8::Array;
 using v8::Boolean;
-using v8::Context;
 using v8::Function;
 using v8::FunctionTemplate;
 using v8::Local;
@@ -22,22 +19,22 @@ using v8::Object;
 using v8::String;
 using v8::Value;
 
+namespace {
+static Nan::Persistent<Function> constructor;
+}
+
 Local<Value> lua2js(struct lua_State *L, int i) {
   EscapableHandleScope scope;
   switch (lua_type(L, i)) {
     case LUA_TNUMBER:
       return scope.Escape(Nan::New<Number>(lua_tonumber(L, i)));
-      break;
     case LUA_TSTRING:
       return scope.Escape(
           Nan::New<String>(lua_tostring(L, i)).ToLocalChecked());
-      break;
     case LUA_TBOOLEAN:
       return scope.Escape(Nan::New<Boolean>(lua_toboolean(L, i)));
-      break;
     default:
       return scope.Escape(Nan::Null());
-      break;
   }
 }
 
@@ -76,10 +73,10 @@ static int lua2js_bind_gen(lua_State *L) {
   auto *callback =
       static_cast<Callback *>(lua_touserdata(L, lua_upvalueindex(1)));
 
-  int argc = lua_gettop(L);
+  auto argc = static_cast<std::size_t>(lua_gettop(L));
   std::vector<Local<Value>> argv(argc);
-  for (int i = 1; i <= argc; i++) {
-    argv[i - 1] = lua2js(L, i);
+  for (std::size_t i = 0; i < argc; ++i) {
+    argv[i] = lua2js(L, static_cast<int>(i + 1));
   }
 
   if (callback->IsEmpty()) {
@@ -87,7 +84,8 @@ static int lua2js_bind_gen(lua_State *L) {
     return 0;
   }
 
-  auto ret = Nan::Call(*callback, argc, argv.data()).ToLocalChecked();
+  auto ret = Nan::Call(*callback, static_cast<int>(argc), argv.data())
+                 .ToLocalChecked();
 
   js2lua(ret, L);
   return 1;
@@ -184,7 +182,7 @@ Local<Object> extract(int index, int depth, lua_State *L) {
     Local<Value> key;
     switch (lua_type(L, -2)) {  // key
       case LUA_TNUMBER: {
-        auto num = static_cast<double>(lua_tonumber(L, -2));
+        auto num = static_cast<uint32_t>(lua_tonumber(L, -2));
         key = Nan::New<v8::Number>(num);
         if (Nan::Has(table, num).FromMaybe(false)) {
           lua_pop(L, 1);

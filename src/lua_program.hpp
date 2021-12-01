@@ -2,18 +2,17 @@
 #define LUA_JS_LUA_PROGRAM_HPP
 
 #include <nan.h>
+#include <v8.h>
 
 class LuaProgram : public Nan::ObjectWrap {
  private:
-  static inline Nan::Persistent<v8::Function> constructor;
-
   struct lua_State *L;
 
   static NAN_METHOD(set_table);
   static NAN_METHOD(start_program);
 
   LuaProgram();
-  ~LuaProgram();
+  ~LuaProgram() override;
 
  public:
   static NAN_MODULE_INIT(Init);
