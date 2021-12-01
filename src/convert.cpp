@@ -41,6 +41,7 @@ void js2lua(Local<Value> const &value, struct lua_State *L) {
     new (callback_block) Callback(f);
 
     lua_pushcclosure(L, lua2js_bind_gen, 1);
+    return;
   }
   if (value->IsBoolean()) {
     auto boolean = To<bool>(value).FromJust();
