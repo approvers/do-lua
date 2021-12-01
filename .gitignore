@@ -123,7 +123,7 @@ typings/
 # nuxt.js build output
 .nuxt
 
-# react / gatsby 
+# react / gatsby
 public/
 
 # vuepress build output
@@ -168,3 +168,7 @@ $RECYCLE.BIN/
 
 build
 .vscode
+
+# clangd config
+.clangd
+compile_flags.txt
