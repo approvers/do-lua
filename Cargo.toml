@@ -9,8 +9,11 @@ license = "Apache-2.0"
 [lib]
 crate-type = ["cdylib"]
 
+[features]
+defaukt = []
+
 [dependencies]
-lua = "0.0.10"
+mlua = { version = "0.7.0", features = ["lua54"] }
 napi = "1"
 napi-derive = "1"
 
