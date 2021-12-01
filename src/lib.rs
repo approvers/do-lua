@@ -8,6 +8,7 @@ fn init(mut exports: JsObject) -> NResult<()> {
     use do_string::*;
 
     exports.create_named_method("doStringSync", do_string_sync)?;
+    exports.create_named_method("doString", do_string_async)?;
 
     Ok(())
 }
