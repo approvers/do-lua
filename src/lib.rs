@@ -1,24 +1,16 @@
 use lua::{State, ThreadStatus};
-use napi::{CallContext, JsObject, JsString, JsUndefined, Result as NResult};
-use napi_derive::{js_function, module_exports};
+use napi::{JsObject, Result as NResult};
+use napi_derive::module_exports;
+
+mod do_string;
 
 #[module_exports]
 fn init(mut exports: JsObject) -> NResult<()> {
-    exports.create_named_method("doStringSync", sync_fn)?;
+    use do_string::*;
+
+    exports.create_named_method("doStringSync", do_string_sync)?;
 
     Ok(())
-}
-
-#[js_function(1)]
-fn sync_fn(cx: CallContext) -> NResult<JsUndefined> {
-    let program = cx.get::<JsString>(0)?.into_utf8()?;
-
-    let mut state = State::new();
-    state.open_libs();
-    let status = state.do_string(program.as_str()?);
-    to_result(status, &mut state)?;
-
-    cx.env.get_undefined()
 }
 
 pub enum LuaJsError {
