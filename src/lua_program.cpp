@@ -179,10 +179,13 @@ Local<Object> extract(int index, int depth, lua_State *L) {
   Local<Object> table = Nan::New<Object>();
   lua_pushnil(L);
   while (lua_next(L, index) != 0) {
+    auto constexpr KEY_INDEX = -2;
+    auto constexpr VALUE_INDEX = -1;
+
     Local<Value> key;
-    switch (lua_type(L, -2)) {  // key
+    switch (lua_type(L, KEY_INDEX)) {  // key
       case LUA_TNUMBER: {
-        auto num = static_cast<uint32_t>(lua_tonumber(L, -2));
+        auto num = static_cast<uint32_t>(lua_tonumber(L, KEY_INDEX));
         key = Nan::New<v8::Number>(num);
         if (Nan::Has(table, num).FromMaybe(false)) {
           lua_pop(L, 1);
@@ -190,7 +193,7 @@ Local<Object> extract(int index, int depth, lua_State *L) {
         }
       } break;
       case LUA_TSTRING: {
-        std::string key_str(lua_tostring(L, -2));
+        std::string key_str(lua_tostring(L, KEY_INDEX));
         key = Nan::New(key_str.c_str()).ToLocalChecked();
         if (key_str == "_G" || key_str == "package") {
           lua_pop(L, 1);
@@ -200,24 +203,26 @@ Local<Object> extract(int index, int depth, lua_State *L) {
     }
 
     Local<Value> value;
-    switch (lua_type(L, -1)) {  // value
+    switch (lua_type(L, VALUE_INDEX)) {
       case LUA_TNUMBER:
-        value = Nan::New<v8::Number>(static_cast<double>(lua_tonumber(L, -1)));
+        value = Nan::New<v8::Number>(
+            static_cast<double>(lua_tonumber(L, VALUE_INDEX)));
         break;
       case LUA_TSTRING: {
-        std::string value_str(lua_tostring(L, -1));
+        std::string value_str(lua_tostring(L, VALUE_INDEX));
         value = Nan::New(value_str).ToLocalChecked();
       } break;
       case LUA_TBOOLEAN:
-        value = Nan::New(lua_toboolean(L, -1));
+        value = Nan::New(lua_toboolean(L, VALUE_INDEX));
         break;
       case LUA_TTABLE:
         if (0 < depth) {
-          value = extract(-2, depth - 1, L);
+          value = extract(VALUE_INDEX, depth - 1, L);
         }
         break;
       default:
-        value = Nan::New(lua_typename(L, lua_type(L, -1))).ToLocalChecked();
+        value = Nan::New(lua_typename(L, lua_type(L, VALUE_INDEX)))
+                    .ToLocalChecked();
         break;
     }
     Nan::Set(table, key, value);
