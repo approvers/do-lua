@@ -16,7 +16,7 @@ test('doFile', () => {
 });
 
 test('Passing table', (done) => {
-  const state = lua_js.loadProgram(`
+  const state = new lua_js.State(`
 obj.ox = 50
 `);
 
@@ -29,22 +29,19 @@ obj.ox = 50
 });
 
 test('Passing function', (done) => {
-  const state = lua_js.loadProgram(`
+  const state = new lua_js.State(`
 obj.mes("Hello, World!")
 `);
   const table = {
     _message: '',
-    mes: (text) => {
-      table._message += text;
+    mes(text)  {
+      this._message += text;
     }
   };
   state.setTable('obj', table);
 
   state.run().then((G) => {
-    // G.obj has not changed because values are not binded by references
-    // but called function is on JavaScript
-    // so we must check _message of table
-    expect(table._message).toBe('Hello, World!');
+    expect(G.obj._message).toBe('Hello, World!');
     done();
   });
 });

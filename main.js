@@ -1,5 +1,17 @@
 const lua_js = require('bindings')('lua-js');
 
+function State(program) {
+  this.state = lua_js.loadProgram(program);
+}
+
+State.prototype.setTable = function setTable(name, obj) {
+  this.state.setTable(name, obj);
+};
+
+State.prototype.run = function run() {
+  return new Promise((resolve) => this.state.run(resolve));
+};
+
 module.exports = {
   doFileSync(file_name) {
     return lua_js.doFileSync(file_name);
@@ -27,25 +39,5 @@ module.exports = {
     });
   },
 
-  loadProgram(program) {
-    return State.fromProgram(program);
-  }
-};
-
-function State() {
-  this.state = {};
-}
-
-State.fromProgram = (program) => {
-  const obj = new State();
-  obj.state = lua_js.loadProgram(program);
-  return obj;
-};
-
-State.prototype.setTable = function(name, obj) {
-  this.state.setTable(name, obj);
-};
-
-State.prototype.run = function() {
-  return new Promise((resolve) => this.state.run(resolve));
+  State,
 };
