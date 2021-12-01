@@ -2,17 +2,16 @@ name: CI
 env:
   DEBUG: napi:*
   APP_NAME: lua-js
-  MACOSX_DEPLOYMENT_TARGET: '10.13'
-'on':
+  MACOSX_DEPLOYMENT_TARGET: "10.13"
+"on":
   push:
     branches:
       - main
     tags-ignore:
-      - '**'
-  pull_request: null
+      - "**"
 jobs:
   build:
-    if: '!contains(github.event.head_commit.message, ''skip ci'')'
+    if: "!contains(github.event.head_commit.message, 'skip ci')"
     strategy:
       fail-fast: false
       matrix:
@@ -75,10 +74,6 @@ jobs:
           DOCKER_USERNAME: ${{ github.actor }}
           DOCKER_PASSWORD: ${{ secrets.GITHUB_TOKEN }}
         if: ${{ matrix.settings.docker }}
-      - name: Setup toolchain
-        run: ${{ matrix.settings.setup }}
-        if: ${{ matrix.settings.setup }}
-        shell: bash
       - name: Install dependencies
         run: yarn install --ignore-scripts --frozen-lockfile --registry https://registry.npmjs.org --network-timeout 300000
       - name: Build
@@ -100,9 +95,9 @@ jobs:
           - host: windows-latest
             target: x86_64-pc-windows-msvc
         node:
-          - '12'
-          - '14'
-          - '16'
+          - "12"
+          - "14"
+          - "16"
     runs-on: ${{ matrix.settings.host }}
     steps:
       - uses: actions/checkout@v2
@@ -136,9 +131,9 @@ jobs:
       fail-fast: false
       matrix:
         node:
-          - '12'
-          - '14'
-          - '16'
+          - "12"
+          - "14"
+          - "16"
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
