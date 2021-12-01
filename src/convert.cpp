@@ -140,6 +140,8 @@ Local<Object> extract(int index, int depth, lua_State *L) {
       case LUA_TTABLE:
         if (0 < depth) {
           value = extract(VALUE_INDEX, depth - 1, L);
+        } else {
+          std::cerr << "lua-js: extract recursion limit exceeded\n";
         }
         break;
       default:
