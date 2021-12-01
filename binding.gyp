@@ -3,6 +3,7 @@
     {
       "target_name": "lua-js",
       "sources": [
+        "src/convert.cpp",
         "src/entry.cpp",
         "src/dofile.cpp",
         "src/dostring.cpp",
