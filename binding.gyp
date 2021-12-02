@@ -13,7 +13,7 @@
                 "<!(node -e \"require('nan')\")",
                 "vendor/lua-5.4.3/src/",
             ],
-            "libraries": ["-Lvendor/lua-5.4.3/src", "-llua"],
+            "libraries": ["vendor/lua-5.4.3/src/liblua.a"],
         }
     ]
 }
