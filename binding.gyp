@@ -11,9 +11,12 @@
             ],
             "include_dirs": [
                 "<!(node -e \"require('nan')\")",
-                "vendor/lua-5.4.3/src/",
+                "<(module_root_dir)/vendor/lua-5.4.3/src/",
             ],
-            "libraries": ["vendor/lua-5.4.3/src/liblua.a"],
+            "libraries": [
+                "-llua",
+                "-L<(module_root_dir)/vendor/lua-5.4.3/src/",
+            ],
         }
     ]
 }
