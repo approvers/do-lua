@@ -35,6 +35,6 @@ spawnSync('make', [...args, 'all', '-j4']).stderr.pipe(stderr);
 
 if (platform === 'win32') {
     chdir(path.join(LUA_PATH, 'src'));
-    spawnSync('lib', ['/OUT:lua.lib', '*.obj']).stderr.pipe(stderr);
+    spawnSync('lib', ['/OUT:lua.lib', '*.o']).stderr.pipe(stderr);
 }
 })();
