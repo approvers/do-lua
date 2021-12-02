@@ -19,7 +19,7 @@
                     'OS=="win"',
                     {
                         "libraries": [
-                            "<(module_root_dir)/vendor/lua-5.4.3/src/lua",
+                            "<(module_root_dir)/vendor/lua-5.4.3/src/liblua",
                         ],
                     },
                     {
