@@ -31,10 +31,20 @@ console.log(`Current platform: ${platform}`);
 if (platform === 'win32') {
     args.push('PLAT=mingw');
 }
-spawnSync('make', [...args, 'all', '-j4']).stderr.pipe(stderr);
+
+const make = spawn('make', [...args, 'all', '-j4']);
+make.stdout.pipe(stderr);
+make.stderr.pipe(stderr);
+
+await new Promise((resolve) => make.on('exit', resolve)
+);
 
 if (platform === 'win32') {
     chdir(path.join(LUA_PATH, 'src'));
-    spawnSync('lib', ['/OUT:lua.lib', '*.o']).stderr.pipe(stderr);
+    const lib = spawn('lib', ['/OUT:lua.lib', '*.o']);
+    lib.stdout.pipe(stderr);
+    lib.stderr.pipe(stderr);
+    await new Promise((resolve) => lib.on('exit', resolve)
+    );
 }
 })();
