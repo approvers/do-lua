@@ -20,10 +20,4 @@
             ],
         }
     ],
-    "conditions": [
-        [
-            'OS in "linux freebsd openbsd solaris android aix cloudabi"',
-            {"cflags": ["-Wno-cast-function-type"]},
-        ]
-    ],
 }
