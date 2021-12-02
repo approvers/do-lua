@@ -4,7 +4,7 @@
   "description": "The Lua binding for JavaScript.",
   "main": "main.js",
   "scripts": {
-    "install": "cd vendor && curl -R -O http://www.lua.org/ftp/lua-5.4.3.tar.gz && tar zxf lua-5.4.3.tar.gz && cd lua-5.4.3 && make all test -j4 && npm run rebuild",
+    "install": "cd vendor && curl -R -O http://www.lua.org/ftp/lua-5.4.3.tar.gz && tar zxf lua-5.4.3.tar.gz && cd lua-5.4.3 && make all -j4 && npm run rebuild",
     "rebuild": "node-gyp rebuild",
     "dev": "node-gyp build --debug",
     "test": "jest"
