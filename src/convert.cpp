@@ -1,7 +1,7 @@
 #include "lua_program.hpp"
 
 #include <iostream>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 
 using Nan::Callback;
 using Nan::EscapableHandleScope;

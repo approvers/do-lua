@@ -1,7 +1,7 @@
 #include "dofile.hpp"
 
 #include <iostream>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 #include <string>
 
 using namespace std;

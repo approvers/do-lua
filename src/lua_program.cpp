@@ -2,7 +2,7 @@
 #include "convert.hpp"
 
 #include <iostream>
-#include <lua/lua.hpp>
+#include <lua.hpp>
 
 using Nan::AsyncResource;
 using Nan::To;
