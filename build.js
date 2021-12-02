@@ -25,7 +25,7 @@ await tar.x({
 
 process.chdir(path.join(__dirname, 'vendor', 'lua-5.4.3'));
 
-const args = ['NYCFLAGS=-fPIC'];
+const args = ['MYCFLAGS=-fPIC'];
 if (process.platform === 'win32') {
     args.push('PLAT=mingw');
 }
