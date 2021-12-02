@@ -1,4 +1,4 @@
-const { chdir, platform } = require('process');
+const { chdir, platform, stderr } = require('process');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
@@ -31,10 +31,10 @@ console.log(`Current platform: ${platform}`);
 if (platform === 'win32') {
     args.push('PLAT=mingw');
 }
-spawnSync('make', [...args, 'all', '-j4']);
+spawnSync('make', [...args, 'all', '-j4']).stderr.pipe(stderr);
 
 if (platform === 'win32') {
     chdir(path.join(LUA_PATH, 'src'));
-    spawnSync('lib', ['/OUT:lua.lib', '*.obj']);
+    spawnSync('lib', ['/OUT:lua.lib', '*.obj']).stderr.pipe(stderr);
 }
 })();
