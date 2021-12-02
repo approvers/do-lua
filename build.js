@@ -2,7 +2,7 @@ const { chdir, platform, stderr } = require('process');
 const fs = require('fs');
 const https = require('https');
 const path = require('path');
-const { spawnSync } = require('child_process');
+const { spawn } = require('child_process');
 const tar = require('tar');
 
 const LUA_GZ = path.join(__dirname, 'vendor', 'lua-5.4.3.tar.gz');
