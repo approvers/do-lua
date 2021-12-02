@@ -4,7 +4,7 @@
   "description": "The Lua binding for JavaScript.",
   "main": "main.js",
   "scripts": {
-    "install": "node build.js && npm run rebuild",
+    "install": "node build.js && npm run rebuild -- -v",
     "rebuild": "node-gyp rebuild",
     "dev": "node-gyp build --debug",
     "test": "jest"
