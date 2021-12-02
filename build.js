@@ -41,7 +41,7 @@ await new Promise((resolve) => make.on('exit', resolve)
 
 if (platform === 'win32') {
     chdir(path.join(LUA_PATH, 'src'));
-    const lib = spawn('lib', ['/OUT:lua.lib', '*.o']);
+    const lib = spawn('ar', ['rcs', 'lua.lib', '*.o']);
     lib.stdout.pipe(stderr);
     lib.stderr.pipe(stderr);
     await new Promise((resolve) => lib.on('exit', resolve)
