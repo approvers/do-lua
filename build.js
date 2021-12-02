@@ -33,6 +33,8 @@ if (platform === 'win32') {
 }
 spawnSync('make', [...args, 'all', '-j4']);
 
-const files = fs.readdirSync(path.join(LUA_PATH, 'src'));
-console.log(`files in lua src ${files}`);
+if (platform === 'win32') {
+    chdir(path.join(LUA_PATH, 'src'));
+    spawnSync('lib', ['/OUT:lua.lib', '*.obj']);
+}
 })();
