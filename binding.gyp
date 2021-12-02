@@ -14,16 +14,18 @@
                 "<!(node -e \"require('nan')\")",
                 "<(module_root_dir)/vendor/lua-5.4.3/src/",
             ],
-            "libraries": [
-                "-llua",
-                "-L<(module_root_dir)/vendor/lua-5.4.3/src/",
-            ],
             "conditions": [
                 [
                     'OS=="win"',
                     {
                         "libraries": [
                             "<(module_root_dir)/vendor/lua-5.4.3/src/lua",
+                        ],
+                    },
+                    {
+                        "libraries": [
+                            "-llua",
+                            "-L<(module_root_dir)/vendor/lua-5.4.3/src/",
                         ],
                     },
                 ]
