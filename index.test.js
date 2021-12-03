@@ -32,16 +32,16 @@ test('Passing function', (done) => {
   const state = loadProgram(`
 obj.mes("Hello, World!")
 `);
+  let message = '';
   const table = {
-    _message: '',
-    mes(text) {
-      this._message += text;
-    }
+    mes: (text) => {
+      message += text;
+    },
   };
   state.setTable('obj', table);
 
-  state.run().then((G) => {
-    expect(G.obj._message).toBe('Hello, World!');
+  state.run().then(() => {
+    expect(message).toBe('Hello, World!');
     done();
   });
 });
