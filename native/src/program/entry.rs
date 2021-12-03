@@ -5,7 +5,7 @@ use std::sync::Arc;
 
 use super::table::Table;
 
-pub type Function = Arc<dyn Fn(Entry) + Send + Sync>;
+pub type Function = Arc<dyn Fn(Vec<Entry>) + Send + Sync>;
 
 pub enum Entry {
     Nil,
@@ -47,12 +47,15 @@ impl Entry {
             } else if let Ok(f) = value.downcast::<JsFunction, _>(cx) {
                 let root = Arc::new(f.root(cx));
                 let channel = cx.channel();
-                Entry::Function(Arc::new(move |args| {
+                Entry::Function(Arc::new(move |entries| {
                     let root = Arc::clone(&root);
                     channel.send(move |mut cx| {
                         let f = root.to_inner(&mut cx);
                         let this = cx.undefined();
-                        let args = args.as_js(&mut cx);
+                        let mut args = vec![];
+                        for entry in entries {
+                            args.push(entry.as_js(&mut cx)?);
+                        }
                         f.call(&mut cx, this, args)?;
                         Ok(())
                     });
@@ -126,16 +129,9 @@ fn lua_upvalueindex(index: Index) -> Index {
 
 fn lua_closure_bind(state: &mut State) -> c_int {
     let argc = state.get_top();
-    let argv = (1..=argc)
-        .flat_map(|i| Entry::from_lua(state, i))
-        .enumerate()
-        .map(|(k, v)| (k.to_string(), v));
-    let arg = {
-        let array = Table::from_iter(argv);
-        Entry::Table(array)
-    };
+    let argv = (1..=argc).flat_map(|i| Entry::from_lua(state, i)).collect();
     let userdata = unsafe { state.to_userdata_typed::<Function>(lua_upvalueindex(1)) }
         .expect("invalid userdata");
-    userdata(arg);
+    userdata(argv);
     1
 }
