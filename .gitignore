@@ -3,7 +3,6 @@ index.node
 node_modules
 npm-debug.log*
 Cargo.lock
-package-lock.json
 
 desktop.ini
 Thumbs.db
