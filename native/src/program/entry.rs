@@ -76,7 +76,7 @@ impl Entry {
             &Entry::Boolean(b) => cx.boolean(b).upcast(),
             &Entry::Number(n) => cx.number(n).upcast(),
             Entry::String(s) => cx.string(s).upcast(),
-            Entry::Function(f) => todo!(),
+            Entry::Function(_f) => cx.string("currently unsupported").upcast(),
             Entry::Table(t) => t.as_js(cx)?,
         })
     }
@@ -90,7 +90,7 @@ impl FromLua for Entry {
             lua::Type::Number => Entry::Number(state.to_number(index)),
             lua::Type::String => Entry::String(state.to_str_in_place(index)?.into()),
             lua::Type::Table => Entry::Table(Table::from_lua(state, index)?),
-            lua::Type::Function => todo!(),
+            lua::Type::Function => Entry::String("currently unsupported".into()),
             ty => {
                 eprintln!("found the value of unsupported type: {:?}", ty);
                 return None;
