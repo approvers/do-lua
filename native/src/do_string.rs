@@ -14,7 +14,8 @@ pub fn do_string_sync(mut cx: FunctionContext) -> JsResult<JsValue> {
 pub fn do_string_async(mut cx: FunctionContext) -> JsResult<JsValue> {
     let program = cx.argument::<JsString>(0)?.value(&mut cx);
     let callback = cx.argument::<JsFunction>(1)?.root(&mut cx);
-    let channel = cx.channel();
+    let mut channel = cx.channel();
+    channel.unref(&mut cx);
 
     std::thread::spawn(move || {
         let mut state = State::new();

@@ -31,7 +31,8 @@ pub fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 pub fn run(mut cx: FunctionContext) -> JsResult<JsUndefined> {
     let program = *cx.argument::<ProgramBox>(0)?;
     let callback = cx.argument::<JsFunction>(1)?;
-    let channel = cx.channel();
+    let mut channel = cx.channel();
+    channel.unref(&mut cx);
 
     program.borrow().run(&mut cx, callback, channel)?;
 
