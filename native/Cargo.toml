@@ -1,5 +1,5 @@
 [package]
-name = "lua-js"
+name = "do-lua"
 version = "0.1.0"
 description = "The Lua runtime for Node.js."
 authors = ["MikuroXina"]

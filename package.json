@@ -1,5 +1,5 @@
 {
-  "name": "lua-js",
+  "name": "do-lua",
   "version": "0.1.0",
   "description": "The Lua runtime for Node.js.",
   "main": "index.js",
@@ -18,12 +18,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/approvers/lua-js.git"
+    "url": "git+https://github.com/approvers/do-lua.git"
   },
   "bugs": {
-    "url": "https://github.com/approvers/lua-js/issues"
+    "url": "https://github.com/approvers/do-lua/issues"
   },
-  "homepage": "https://github.com/approvers/lua-js#readme",
+  "homepage": "https://github.com/approvers/do-lua#readme",
   "keywords": [
     "Lua",
     "Node",

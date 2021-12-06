@@ -1,23 +1,30 @@
-# lua-js
+# do-lua
 
-The simple Lua executor for JavaScript.
+The Lua runtime for Node.js.
 
 ## Usage
 
 ```js
+const { doFile, doString } = require('do-lua');
+
 const program = `
 print("Hello, World!")
 `;
 
-lua_js.doString(program).then(() => {
-  console.log("Done");
+doString(program).then(() => {
+  console.log("Done doString");
+})
+doFile('examples/test1.lua').then(() => {
+  console.log("Done doFile");
 })
 ```
 
-You cannot use `this` in functions of the passing table. Use arrow function instead of that.
+You cannot use `this` in functions of the passing table on `loadProgram`. Use arrow function instead of that.
 
 ```js
-const state = lua_js.loadProgram(`
+const { loadProgram } = require('do-lua');
+
+const state = loadProgram(`
 obj.ox = 50;
 obj.mes("Hello, World!")
 `);
