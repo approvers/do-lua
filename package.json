@@ -1,34 +1,32 @@
 {
   "name": "lua-js",
-  "version": "1.0.1",
-  "description": "The Lua binding for JavaScript.",
-  "main": "main.js",
+  "version": "0.1.0",
+  "description": "The Lua runtime for Node.js.",
+  "main": "index.js",
   "scripts": {
-    "install": "node-gyp rebuild",
-    "dev": "node-gyp build --debug",
-    "test": "jest"
+    "build": "cd native && cargo-cp-artifact -nc index.node -- cargo build --message-format=json-render-diagnostics",
+    "build-debug": "npm run build --",
+    "build-release": "npm run build -- --release",
+    "install": "npm run build-release",
+    "test": "npm run build && jest --forceExit"
+  },
+  "author": "MikuroXina",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "cargo-cp-artifact": "^0.1",
+    "jest": "^27.3.1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/approvers/lua-js.git"
   },
-  "keywords": [
-    "Lua",
-    "Node",
-    "JavaScript"
-  ],
-  "author": "MikuroXina",
-  "license": "Apache-2.0",
-  "gypfile": true,
   "bugs": {
     "url": "https://github.com/approvers/lua-js/issues"
   },
   "homepage": "https://github.com/approvers/lua-js#readme",
-  "dependencies": {
-    "bindings": "^1.5.0",
-    "nan": "^2.14.2"
-  },
-  "devDependencies": {
-    "jest": "^26.6.3"
-  }
+  "keywords": [
+    "Lua",
+    "Node",
+    "JavaScript"
+  ]
 }
