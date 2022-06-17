@@ -19,7 +19,7 @@ pub fn load_program(mut cx: FunctionContext) -> JsResult<ProgramBox> {
 }
 
 pub fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let program = *cx.argument::<ProgramBox>(0)?;
+    let program = cx.argument::<ProgramBox>(0)?;
     let name = cx.argument::<JsString>(1)?.value(&mut cx);
     let table = cx.argument::<JsObject>(2)?;
 
@@ -29,7 +29,7 @@ pub fn set_table(mut cx: FunctionContext) -> JsResult<JsUndefined> {
 }
 
 pub fn run(mut cx: FunctionContext) -> JsResult<JsUndefined> {
-    let program = *cx.argument::<ProgramBox>(0)?;
+    let program = cx.argument::<ProgramBox>(0)?;
     let callback = cx.argument::<JsFunction>(1)?;
     let mut channel = cx.channel();
     channel.unref(&mut cx);

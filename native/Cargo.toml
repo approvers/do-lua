@@ -14,7 +14,7 @@ crate-type = ["cdylib"]
 
 [dependencies]
 lua = { version = "0.0.10" }
-neon = { version = "0.9.1", default-features = false, features = [
+neon = { version = "0.10.1", default-features = false, features = [
     "napi-6",
     "channel-api",
 ] }
