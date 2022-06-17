@@ -1,6 +1,6 @@
 {
   "name": "do-lua",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "The Lua runtime for Node.js.",
   "main": "index.js",
   "scripts": {
