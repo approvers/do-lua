@@ -1,4 +1,4 @@
-const { doFile, doString, loadProgram } = require('.');
+import { doFile, doString, loadProgram } from '.';
 
 test('doString', () => {
   const program = `

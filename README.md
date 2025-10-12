@@ -5,24 +5,20 @@ The Lua runtime for Node.js.
 ## Usage
 
 ```js
-const { doFile, doString } = require('do-lua');
+import { doFile, doString } from 'do-lua';
 
 const program = `
 print("Hello, World!")
 `;
 
-doString(program).then(() => {
-  console.log("Done doString");
-})
-doFile('examples/test1.lua').then(() => {
-  console.log("Done doFile");
-})
+await doString(program);
+await doFile('examples/test1.lua');
 ```
 
 You cannot use `this` in functions of the passing table on `loadProgram`. Use arrow function instead of that.
 
 ```js
-const { loadProgram } = require('do-lua');
+import { loadProgram } from 'do-lua';
 
 const state = loadProgram(`
 obj.ox = 50;
@@ -37,8 +33,8 @@ const table = {
 };
 state.setTable('obj', table);
 
-state.run().then((G) => { // G is global table exclusive "package" and "_G"
-  console.log("ox: ", G.obj.ox); // 50
-  console.log("Message: ", message); // Hello, World!
-});
+// G is global table exclusive "package" and "_G"
+const G = await state.run()
+console.log("ox: ", G.obj.ox); // 50
+console.log("Message: ", message); // Hello, World!
 ```

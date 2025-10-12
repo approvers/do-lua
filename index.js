@@ -1,18 +1,20 @@
-const native = require('./native');
+import * as native from './native';
 
-function StateConstructor(program) {
-    this.program = native.loadProgram(program);
-};
+class StateConstructor {
+    constructor(program) {
+        this.program = native.loadProgram(program);
+    }
 
-StateConstructor.prototype.setTable = function setTable(name, table) {
-    native.setTable(this.program, name, table);
-};
+    setTable(name, table) {
+        native.setTable(this.program, name, table);
+    }
 
-StateConstructor.prototype.run = function run() {
-    return new Promise((resolve) => native.run(this.program, resolve));
-};
+    run() {
+        return new Promise((resolve) => native.run(this.program, resolve));
+    }
+}
 
-module.exports = {
+exports = {
     doStringSync: native.doStringSync,
     doString: native.doStringAsync,
     doFileSync: native.doFileSync,
