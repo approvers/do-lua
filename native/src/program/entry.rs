@@ -65,7 +65,7 @@ impl Entry {
             } else if let Ok(o) = value.downcast::<JsObject, _>(cx) {
                 Entry::Table(Table::from_js(cx, o)?)
             } else {
-                return cx.throw_type_error(&format!(
+                return cx.throw_type_error(format!(
                     "found value of unsupported type on the key: {:?}",
                     key
                 ));
